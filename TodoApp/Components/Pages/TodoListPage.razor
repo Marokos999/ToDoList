@@ -1,0 +1,188 @@
+@page "/list/{ListId:guid}"
+@attribute [Authorize]
+@rendermode InteractiveServer
+@implements IAsyncDisposable
+@inject ITodoService TodoService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Nav
+
+<PageTitle>@(list?.Name ?? "Lista")</PageTitle>
+
+<div class="container mt-4">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <RadzenButton Icon="arrow_back" ButtonStyle="ButtonStyle.Light" Click="@(() => Nav.NavigateTo("/"))" />
+        <h3 class="mb-0">@(list?.Name ?? "...")</h3>
+    </div>
+
+    @* Forma za novi task *@
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label">Naziv</label>
+                    <RadzenTextBox @bind-Value="newTitle" Placeholder="Novi zadatak..." Style="width:100%" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Prioritet</label>
+                    <select class="form-select" @bind="newPriority">
+                        @foreach (var p in priorities)
+                        {
+                            <option value="@p">@p</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Rok</label>
+                    <RadzenDatePicker @bind-Value="newDueDate" Style="width:100%" />
+                </div>
+                <div class="col-md-1">
+                    <RadzenButton Icon="add" Click="AddItem" Style="width:100%" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Lista taskova *@
+    @if (items is null)
+    {
+        <p>Učitavanje...</p>
+    }
+    else if (!items.Any())
+    {
+        <p class="text-muted">Nema zadataka. Dodajte prvi!</p>
+    }
+    else
+    {
+        @foreach (var item in items)
+        {
+            <div class="card mb-2 shadow-sm @(item.IsCompleted ? "opacity-50" : "")">
+                <div class="card-body py-2 d-flex align-items-center gap-3">
+                    <RadzenCheckBox Value="@item.IsCompleted"
+                                    TValue="bool"
+                                    Change="@(_ => ToggleItem(item.Id))" />
+                    <span class="flex-grow-1 @(item.IsCompleted ? "text-decoration-line-through" : "")">
+                        @item.Title
+                    </span>
+                    <RadzenBadge Text="@item.Priority.ToString()"
+                                 BadgeStyle="@GetBadgeStyle(item.Priority)" />
+                    @if (item.DueDate.HasValue)
+                    {
+                        <small class="text-muted">@item.DueDate.Value.ToString("dd.MM.")</small>
+                    }
+                    <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
+                                  Size="ButtonSize.Small"
+                                  Click="@(() => DeleteItem(item.Id))" />
+                </div>
+            </div>
+        }
+    }
+
+    @* Dijeljenje liste *@
+    <div class="mt-4">
+        <h6>Dijeli listu</h6>
+        <div class="d-flex gap-2">
+            <RadzenTextBox @bind-Value="shareEmail" Placeholder="Email korisnika..." Style="width:300px" />
+            <RadzenButton Text="Dijeli" Click="ShareList" />
+        </div>
+        @if (!string.IsNullOrEmpty(shareMessage))
+        {
+            <small class="text-muted mt-1 d-block">@shareMessage</small>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public Guid ListId { get; set; }
+
+    private TodoList? list;
+    private List<TodoItem>? items;
+    private string userId = string.Empty;
+
+    private string newTitle = string.Empty;
+    private Priority newPriority = Priority.Medium;
+    private DateTime? newDueDate;
+    private List<Priority> priorities = Enum.GetValues<Priority>().ToList();
+
+    private string shareEmail = string.Empty;
+    private string shareMessage = string.Empty;
+
+    private HubConnection? hubConnection;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var auth = await AuthStateProvider.GetAuthenticationStateAsync();
+        userId = auth.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+        await LoadData();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(Nav.ToAbsoluteUri("/todohub"))
+            .Build();
+
+        hubConnection.On("TaskChanged", async () =>
+        {
+            await LoadItems();
+            await InvokeAsync(StateHasChanged);
+        });
+
+        await hubConnection.StartAsync();
+        await hubConnection.SendAsync("JoinListAsync", ListId.ToString());
+    }
+
+    private async Task LoadData()
+    {
+        list = await TodoService.GetListAsync(ListId, userId);
+        await LoadItems();
+    }
+
+    private async Task LoadItems()
+    {
+        items = await TodoService.GetItemsAsync(ListId, userId);
+    }
+
+    private async Task AddItem()
+    {
+        if (string.IsNullOrWhiteSpace(newTitle)) return;
+        await TodoService.AddItemAsync(ListId, newTitle, newPriority, newDueDate, userId);
+        newTitle = string.Empty;
+        newDueDate = null;
+    }
+
+    private async Task ToggleItem(Guid itemId)
+    {
+        await TodoService.ToggleCompleteAsync(itemId, userId);
+    }
+
+    private async Task DeleteItem(Guid itemId)
+    {
+        await TodoService.DeleteItemAsync(itemId, userId);
+    }
+
+    private async Task ShareList()
+    {
+        if (string.IsNullOrWhiteSpace(shareEmail)) return;
+        await TodoService.ShareListAsync(ListId, userId, shareEmail);
+        shareEmail = string.Empty;
+        shareMessage = "Lista je podijeljena!";
+    }
+
+    private BadgeStyle GetBadgeStyle(Priority p) => p switch
+    {
+        Priority.High => BadgeStyle.Danger,
+        Priority.Medium => BadgeStyle.Warning,
+        _ => BadgeStyle.Light
+    };
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.SendAsync("LeaveListAsync", ListId.ToString());
+            await hubConnection.DisposeAsync();
+        }
+    }
+}

@@ -4,12 +4,18 @@ using Microsoft.EntityFrameworkCore;
 using TodoApp.Components;
 using TodoApp.Components.Account;
 using TodoApp.Data;
+using TodoApp.Hubs;
+using TodoApp.Application;
 using Radzen;
+
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddScoped<ITodoService, TodoService>();
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityRedirectManager>();
@@ -59,5 +65,6 @@ app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 app.MapAdditionalIdentityEndpoints();
+app.MapHub<TodoHub>("/todohub");
 
 app.Run();
