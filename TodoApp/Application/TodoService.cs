@@ -65,6 +65,7 @@ public class TodoService(IDbContextFactory<ApplicationDbContext> dbFactory, IHub
     if(list is null) return;
     list.IsDeleted = true;
     await db.SaveChangesAsync();
+    await hub.Clients.Group(listId.ToString()).SendAsync("TaskChanged");
   }
 
   public async Task<List<TodoItem>> GetItemsAsync(Guid listId, string userId)
@@ -82,7 +83,6 @@ public class TodoService(IDbContextFactory<ApplicationDbContext> dbFactory, IHub
   {
     await using var db = await dbFactory.CreateDbContextAsync();
     return await AccessibleLists(db, userId)
-                  .Include(l => l.Items.OrderBy(i => i.Order))
                   .FirstOrDefaultAsync(l => l.Id == listId);
   }
 
@@ -99,6 +99,17 @@ public class TodoService(IDbContextFactory<ApplicationDbContext> dbFactory, IHub
 
 
     return owner.Union(share).OrderByDescending(l => l.CreatedAt).ToList();
+  }
+
+  public async Task RenameListAsync(Guid listId, string name, string userId)
+  {
+    await using var db = await dbFactory.CreateDbContextAsync();
+    var list = await db.TodoLists.FirstOrDefaultAsync(l => l.Id == listId && l.OwnerId == userId);
+    if(list is null) return;
+
+    list.Name = name.Trim();
+    await db.SaveChangesAsync();
+    await hub.Clients.Group(listId.ToString()).SendAsync("TaskChanged");
   }
 
   public async Task<ShareResult> ShareListAsync(Guid listId, string ownerUserId, string targetEmail)

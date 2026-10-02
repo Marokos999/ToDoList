@@ -13,7 +13,27 @@
 <div class="container mt-4">
     <div class="d-flex align-items-center gap-3 mb-4">
         <RadzenButton Icon="arrow_back" ButtonStyle="ButtonStyle.Light" Click="@(() => Nav.NavigateTo("/"))" />
-        <h3 class="mb-0">@(list?.Name ?? "...")</h3>
+        @if (isRenaming)
+        {
+            <form class="d-flex align-items-center gap-2 flex-grow-1" @onsubmit="SaveName" @onsubmit:preventDefault>
+                <RadzenTextBox @bind-Value="nameDraft" Style="width:100%; max-width:400px" />
+                <RadzenButton Text="Sačuvaj" ButtonType="ButtonType.Submit" />
+                <RadzenButton Text="Odustani" ButtonStyle="ButtonStyle.Light" Click="@(() => isRenaming = false)" />
+                @if (!string.IsNullOrEmpty(nameError))
+                {
+                    <small class="text-danger">@nameError</small>
+                }
+            </form>
+        }
+        else
+        {
+            <h3 class="mb-0">@(list?.Name ?? "...")</h3>
+            @if (list?.OwnerId == userId)
+            {
+                <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Click="StartRename" title="Preimenuj listu" />
+                <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Click="DeleteList" title="Obriši listu" Style="margin-left:auto" />
+            }
+        }
     </div>
 
     @if (items is null)
@@ -138,6 +158,10 @@
     private Guid? expandedItemId;
     private string descriptionDraft = string.Empty;
 
+    private bool isRenaming;
+    private string nameDraft = string.Empty;
+    private string nameError = string.Empty;
+
     private HubConnection? hubConnection;
 
     protected override async Task OnInitializedAsync()
@@ -159,7 +183,7 @@
 
         hubConnection.On("TaskChanged", () => InvokeAsync(async () =>
         {
-            await LoadItems();
+            await LoadData();
             StateHasChanged();
         }));
 
@@ -231,6 +255,38 @@
         await TodoService.UpdateDescriptionAsync(itemId, descriptionDraft, userId);
         await LoadItems();
         expandedItemId = null;
+    }
+
+    private void StartRename()
+    {
+        nameDraft = list?.Name ?? string.Empty;
+        nameError = string.Empty;
+        isRenaming = true;
+    }
+
+    private async Task SaveName()
+    {
+        if (string.IsNullOrWhiteSpace(nameDraft))
+        {
+            nameError = "Unesi naziv liste.";
+            return;
+        }
+
+        await TodoService.RenameListAsync(ListId, nameDraft, userId);
+        await LoadData();
+        isRenaming = false;
+    }
+
+    private async Task DeleteList()
+    {
+        var confirmed = await DialogService.Confirm(
+            @<span>Da li sigurno želiš da obrišeš listu „@(list?.Name)“?</span>,
+            "Brisanje liste",
+            new ConfirmOptions { OkButtonText = "Obriši", CancelButtonText = "Odustani" });
+        if (confirmed != true) return;
+
+        await TodoService.DeleteListAsync(ListId, userId);
+        Nav.NavigateTo("/");
     }
 
     private async Task ShareList()
