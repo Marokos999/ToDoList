@@ -10,7 +10,7 @@ public interface ITodoService
     Task DeleteListAsync(Guid listId, string userId);
 
     Task<List<TodoItem>> GetItemsAsync(Guid listId, string userId);
-    Task<TodoItem> AddItemAsync(Guid listId, string title, Priority priority, DateTime? dueDate, string userId);
+    Task<TodoItem?> AddItemAsync(Guid listId, string title, Priority priority, DateTime? dueDate, string userId);
     Task ToggleCompleteAsync(Guid itemId, string userId);
     Task DeleteItemAsync(Guid itemId, string userId);
     Task UpdateDescriptionAsync(Guid itemId, string? description, string userId);

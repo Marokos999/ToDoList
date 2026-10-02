@@ -15,95 +15,102 @@
         <h3 class="mb-0">@(list?.Name ?? "...")</h3>
     </div>
 
-    @* Forma za novi task *@
-    <div class="card mb-4 shadow-sm">
-        <div class="card-body">
-            <div class="row g-2 align-items-end">
-                <div class="col-md-5">
-                    <label class="form-label">Naziv</label>
-                    <RadzenTextBox @bind-Value="newTitle" Placeholder="Novi zadatak..." Style="width:100%" />
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Prioritet</label>
-                    <select class="form-select" @bind="newPriority">
-                        @foreach (var p in priorities)
-                        {
-                            <option value="@p">@p</option>
-                        }
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Rok</label>
-                    <RadzenDatePicker @bind-Value="newDueDate" Style="width:100%" />
-                </div>
-                <div class="col-md-1">
-                    <RadzenButton Icon="add" Click="AddItem" Style="width:100%" />
-                </div>
-            </div>
-        </div>
-    </div>
-
-    @* Lista taskova *@
     @if (items is null)
     {
         <p>Učitavanje...</p>
     }
-    else if (!items.Any())
+    else if (list is null)
     {
-        <p class="text-muted">Nema zadataka. Dodajte prvi!</p>
+        <p class="text-muted">Nemaš pristup ovoj listi ili ona ne postoji.</p>
     }
     else
     {
-        @foreach (var item in items)
-        {
-            <div class="card mb-2 shadow-sm @(item.IsCompleted ? "opacity-50" : "")">
-                <div class="card-body py-2 d-flex align-items-center gap-3">
-                    <RadzenCheckBox Value="@item.IsCompleted"
-                                    TValue="bool"
-                                    Change="@(_ => ToggleItem(item.Id))" />
-                    <span class="flex-grow-1 @(item.IsCompleted ? "text-decoration-line-through" : "")"
-                          style="cursor:pointer" @onclick="() => ToggleExpand(item)">
-                        @item.Title
-                        @if (!string.IsNullOrEmpty(item.Description))
-                        {
-                            <RadzenIcon Icon="notes" Style="font-size:1rem; vertical-align:middle; margin-left:.25rem; opacity:.6" />
-                        }
-                    </span>
-                    <RadzenBadge Text="@item.Priority.ToString()"
-                                 BadgeStyle="@GetBadgeStyle(item.Priority)" />
-                    @if (item.DueDate.HasValue)
-                    {
-                        <small class="text-muted">@item.DueDate.Value.ToString("dd.MM.")</small>
-                    }
-                    <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
-                                  Size="ButtonSize.Small"
-                                  Click="@(() => DeleteItem(item.Id))" />
-                </div>
-                @if (expandedItemId == item.Id)
-                {
-                    <div class="card-body pt-0">
-                        <RadzenTextArea @bind-Value="descriptionDraft" Placeholder="Dodaj opis..." Rows="3" Style="width:100%" />
-                        <div class="d-flex justify-content-end mt-2">
-                            <RadzenButton Text="Sačuvaj" Size="ButtonSize.Small" Click="@(() => SaveDescription(item.Id))" />
-                        </div>
+        @* Forma za novi task *@
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-5">
+                        <label class="form-label">Naziv</label>
+                        <RadzenTextBox @bind-Value="newTitle" Placeholder="Novi zadatak..." Style="width:100%" />
                     </div>
-                }
+                    <div class="col-md-3">
+                        <label class="form-label">Prioritet</label>
+                        <select class="form-select" @bind="newPriority">
+                            @foreach (var p in priorities)
+                            {
+                                <option value="@p">@p</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Rok</label>
+                        <RadzenDatePicker @bind-Value="newDueDate" Style="width:100%" />
+                    </div>
+                    <div class="col-md-1">
+                        <RadzenButton Icon="add" Click="AddItem" Style="width:100%" />
+                    </div>
+                </div>
             </div>
-        }
-    }
-
-    @* Deljenje liste *@
-    <div class="mt-4">
-        <h6>Deli listu</h6>
-        <div class="d-flex gap-2">
-            <RadzenTextBox @bind-Value="shareEmail" Placeholder="Email korisnika..." Style="width:300px" />
-            <RadzenButton Text="Deli" Click="ShareList" />
         </div>
-        @if (!string.IsNullOrEmpty(shareMessage))
+
+        @* Lista taskova *@
+        @if (!items.Any())
         {
-            <small class="text-muted mt-1 d-block">@shareMessage</small>
+            <p class="text-muted">Nema zadataka. Dodajte prvi!</p>
         }
-    </div>
+        else
+        {
+            @foreach (var item in items)
+            {
+                <div class="card mb-2 shadow-sm @(item.IsCompleted ? "opacity-50" : "")">
+                    <div class="card-body py-2 d-flex align-items-center gap-3">
+                        <RadzenCheckBox Value="@item.IsCompleted"
+                                        TValue="bool"
+                                        Change="@(_ => ToggleItem(item.Id))" />
+                        <span class="flex-grow-1 @(item.IsCompleted ? "text-decoration-line-through" : "")"
+                              style="cursor:pointer" @onclick="() => ToggleExpand(item)">
+                            @item.Title
+                            @if (!string.IsNullOrEmpty(item.Description))
+                            {
+                                <RadzenIcon Icon="notes" Style="font-size:1rem; vertical-align:middle; margin-left:.25rem; opacity:.6" />
+                            }
+                        </span>
+                        <RadzenBadge Text="@item.Priority.ToString()"
+                                     BadgeStyle="@GetBadgeStyle(item.Priority)" />
+                        @if (item.DueDate.HasValue)
+                        {
+                            <small class="text-muted">@item.DueDate.Value.ToString("dd.MM.")</small>
+                        }
+                        <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
+                                      Size="ButtonSize.Small"
+                                      Click="@(() => DeleteItem(item.Id))" />
+                    </div>
+                    @if (expandedItemId == item.Id)
+                    {
+                        <div class="card-body pt-0">
+                            <RadzenTextArea @bind-Value="descriptionDraft" Placeholder="Dodaj opis..." Rows="3" Style="width:100%" />
+                            <div class="d-flex justify-content-end mt-2">
+                                <RadzenButton Text="Sačuvaj" Size="ButtonSize.Small" Click="@(() => SaveDescription(item.Id))" />
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        }
+
+        @* Deljenje liste *@
+        <div class="mt-4">
+            <h6>Deli listu</h6>
+            <div class="d-flex gap-2">
+                <RadzenTextBox @bind-Value="shareEmail" Placeholder="Email korisnika..." Style="width:300px" />
+                <RadzenButton Text="Deli" Click="ShareList" />
+            </div>
+            @if (!string.IsNullOrEmpty(shareMessage))
+            {
+                <small class="text-muted mt-1 d-block">@shareMessage</small>
+            }
+        </div>
+    }
 </div>
 
 @code {
