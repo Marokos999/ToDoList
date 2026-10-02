@@ -9,7 +9,8 @@ COPY TodoApp/TodoApp.csproj TodoApp/
 RUN dotnet restore TodoApp/TodoApp.csproj
 
 COPY TodoApp/ TodoApp/
-RUN dotnet publish TodoApp/TodoApp.csproj -c Release -o /app/publish --no-restore
+# No --no-restore: the SDK only adds the pack containing blazor.web.js once it sees .razor files, which the csproj-only restore above can't
+RUN dotnet publish TodoApp/TodoApp.csproj -c Release -o /app/publish
 
 # ---- runtime ----
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final

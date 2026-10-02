@@ -28,6 +28,8 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ConnectionStrings__DefaultConnection: Host=db;Port=5432;Database=${POSTGRES_DB:-todoapp};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}
+      # TodoListPage's HubConnection runs inside the container, so it must target the container port, not the host-mapped one
+      TodoHubUrl: http://localhost:8080/todohub
     ports:
       - "${APP_PORT:-8081}:8080"
     volumes:

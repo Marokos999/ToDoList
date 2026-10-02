@@ -5,6 +5,7 @@
 @inject ITodoService TodoService
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Nav
+@inject IConfiguration Config
 
 <PageTitle>@(list?.Name ?? "Lista")</PageTitle>
 
@@ -119,8 +120,10 @@
     {
         if (!firstRender) return;
 
+        var hubUrl = Config["TodoHubUrl"] ?? Nav.ToAbsoluteUri("/todohub").ToString();
+
         hubConnection = new HubConnectionBuilder()
-            .WithUrl(Nav.ToAbsoluteUri("/todohub"))
+            .WithUrl(hubUrl)
             .Build();
 
         hubConnection.On("TaskChanged", async () =>
@@ -181,7 +184,6 @@
     {
         if (hubConnection is not null)
         {
-            await hubConnection.SendAsync("LeaveListAsync", ListId.ToString());
             await hubConnection.DisposeAsync();
         }
     }
