@@ -15,5 +15,5 @@ public interface ITodoService
     Task DeleteItemAsync(Guid itemId, string userId);
     Task UpdateDescriptionAsync(Guid itemId, string? description, string userId);
 
-    Task ShareListAsync(Guid listId, string ownerUserId, string targetEmail);
+    Task<ShareResult> ShareListAsync(Guid listId, string ownerUserId, string targetEmail);
 }

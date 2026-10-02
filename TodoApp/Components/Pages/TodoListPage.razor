@@ -99,17 +99,20 @@
         }
 
         @* Deljenje liste *@
-        <div class="mt-4">
-            <h6>Deli listu</h6>
-            <div class="d-flex gap-2">
-                <RadzenTextBox @bind-Value="shareEmail" Placeholder="Email korisnika..." Style="width:300px" />
-                <RadzenButton Text="Deli" Click="ShareList" />
+        @if (list.OwnerId == userId)
+        {
+            <div class="mt-4">
+                <h6>Deli listu</h6>
+                <div class="d-flex gap-2">
+                    <RadzenTextBox @bind-Value="shareEmail" Placeholder="Email korisnika..." Style="width:300px" />
+                    <RadzenButton Text="Deli" Click="ShareList" />
+                </div>
+                @if (!string.IsNullOrEmpty(shareMessage))
+                {
+                    <small class="@(shareSucceeded ? "text-success" : "text-danger") mt-1 d-block">@shareMessage</small>
+                }
             </div>
-            @if (!string.IsNullOrEmpty(shareMessage))
-            {
-                <small class="text-muted mt-1 d-block">@shareMessage</small>
-            }
-        </div>
+        }
     }
 </div>
 
@@ -127,6 +130,7 @@
 
     private string shareEmail = string.Empty;
     private string shareMessage = string.Empty;
+    private bool shareSucceeded;
 
     private Guid? expandedItemId;
     private string descriptionDraft = string.Empty;
@@ -209,10 +213,24 @@
 
     private async Task ShareList()
     {
-        if (string.IsNullOrWhiteSpace(shareEmail)) return;
-        await TodoService.ShareListAsync(ListId, userId, shareEmail);
-        shareEmail = string.Empty;
-        shareMessage = "Lista je podeljena!";
+        if (string.IsNullOrWhiteSpace(shareEmail))
+        {
+            shareSucceeded = false;
+            shareMessage = "Unesi email korisnika.";
+            return;
+        }
+
+        var result = await TodoService.ShareListAsync(ListId, userId, shareEmail);
+        shareSucceeded = result == ShareResult.Shared;
+        shareMessage = result switch
+        {
+            ShareResult.Shared => "Lista je podeljena!",
+            ShareResult.UserNotFound => "Ne postoji korisnik sa tim emailom.",
+            ShareResult.AlreadyShared => "Lista je već podeljena sa tim korisnikom.",
+            ShareResult.SelfShare => "Ne možeš da podeliš listu sa sobom.",
+            _ => "Samo vlasnik može da deli listu."
+        };
+        if (shareSucceeded) shareEmail = string.Empty;
     }
 
     private BadgeStyle GetBadgeStyle(Priority p) => p switch

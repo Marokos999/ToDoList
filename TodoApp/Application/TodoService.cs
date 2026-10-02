@@ -101,22 +101,24 @@ public class TodoService(IDbContextFactory<ApplicationDbContext> dbFactory, IHub
     return owner.Union(share).OrderByDescending(l => l.CreatedAt).ToList();
   }
 
-  public async Task ShareListAsync(Guid listId, string ownerUserId, string targetEmail)
+  public async Task<ShareResult> ShareListAsync(Guid listId, string ownerUserId, string targetEmail)
   {
     await using var db = await dbFactory.CreateDbContextAsync();
-    var list = await db.TodoLists.FirstOrDefaultAsync(l => l.Id == listId && l.OwnerId == ownerUserId);
-    if(list is null) return;
+    var isOwner = await db.TodoLists.AnyAsync(l => l.Id == listId && l.OwnerId == ownerUserId);
+    if(!isOwner) return ShareResult.NotOwner;
 
-    var targerUser = await userManager.FindByEmailAsync(targetEmail);
-    if(targerUser is null) return;
+    var targetUser = await userManager.FindByEmailAsync(targetEmail.Trim());
+    if(targetUser is null) return ShareResult.UserNotFound;
+    if(targetUser.Id == ownerUserId) return ShareResult.SelfShare;
 
-    var alreadyShare = await db.TodoListShares
-                              .AnyAsync(s => s.ListId == listId && s.UserId == targerUser.Id);
-    if(alreadyShare) return;
+    var alreadyShared = await db.TodoListShares
+                              .AnyAsync(s => s.ListId == listId && s.UserId == targetUser.Id);
+    if(alreadyShared) return ShareResult.AlreadyShared;
 
-    db.TodoListShares.Add(new TodoListShare{ListId = listId, UserId = targerUser.Id});
+    db.TodoListShares.Add(new TodoListShare{ListId = listId, UserId = targetUser.Id});
 
     await db.SaveChangesAsync();
+    return ShareResult.Shared;
   }
 
   public async Task ToggleCompleteAsync(Guid itemId, string userId)
