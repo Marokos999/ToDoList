@@ -7,10 +7,11 @@ using TodoApp.Hubs;
 
 namespace TodoApp.Application;
 
-public class TodoService(ApplicationDbContext db, IHubContext<TodoHub> hub , UserManager<ApplicationUser> userManager) : ITodoService
+public class TodoService(IDbContextFactory<ApplicationDbContext> dbFactory, IHubContext<TodoHub> hub , UserManager<ApplicationUser> userManager) : ITodoService
 {
   public async Task<TodoItem> AddItemAsync(Guid listId, string title, Priority priority, DateTime? dueDate, string userId)
   {
+    await using var db = await dbFactory.CreateDbContextAsync();
     var maxOrder = await db.TodoItems
                           .Where(i => i.ListId == listId)
                           .MaxAsync(i => (int?)i.Order) ?? 0;
@@ -31,6 +32,7 @@ public class TodoService(ApplicationDbContext db, IHubContext<TodoHub> hub , Use
 
   public async Task<TodoList> CreateListAsync(string name, string userId)
   {
+    await using var db = await dbFactory.CreateDbContextAsync();
     var list = new TodoList
     {
       Name = name,
@@ -44,6 +46,7 @@ public class TodoService(ApplicationDbContext db, IHubContext<TodoHub> hub , Use
 
   public async Task DeleteItemAsync(Guid itemId, string userId)
   {
+    await using var db = await dbFactory.CreateDbContextAsync();
     var item = await db.TodoItems.FindAsync(itemId);
     if(item is null) return;
 
@@ -55,6 +58,7 @@ public class TodoService(ApplicationDbContext db, IHubContext<TodoHub> hub , Use
 
   public async Task DeleteListAsync(Guid listId, string userId)
   {
+    await using var db = await dbFactory.CreateDbContextAsync();
     var list = await db.TodoLists.FirstOrDefaultAsync(l => l.Id == listId && l.OwnerId == userId);
     if(list is null) return;
     list.IsDeleted = true;
@@ -63,6 +67,7 @@ public class TodoService(ApplicationDbContext db, IHubContext<TodoHub> hub , Use
 
   public async Task<List<TodoItem>> GetItemsAsync(Guid listId, string userId)
   {
+    await using var db = await dbFactory.CreateDbContextAsync();
     var hasAccess = await db.TodoLists.AnyAsync(l => l.Id == listId && (l.OwnerId == userId ||
                                                 l.Shares.Any(s => s.UserId == userId)));
 
@@ -76,6 +81,7 @@ public class TodoService(ApplicationDbContext db, IHubContext<TodoHub> hub , Use
 
   public async Task<TodoList?> GetListAsync(Guid listId, string userId)
   {
+    await using var db = await dbFactory.CreateDbContextAsync();
     return await db.TodoLists
                   .Include(l => l.Items.OrderBy(i => i.Order))
                   .FirstOrDefaultAsync(l => l.Id == listId && (l.OwnerId == userId || l.Shares.Any(s => s.UserId == userId)));
@@ -83,6 +89,7 @@ public class TodoService(ApplicationDbContext db, IHubContext<TodoHub> hub , Use
 
   public async Task<List<TodoList>> GetListsForUserAsync(string userId)
   {
+    await using var db = await dbFactory.CreateDbContextAsync();
     var owner = await db.TodoLists
                         .Where(i => i.OwnerId == userId)
                         .ToListAsync();
@@ -97,6 +104,7 @@ public class TodoService(ApplicationDbContext db, IHubContext<TodoHub> hub , Use
 
   public async Task ShareListAsync(Guid listId, string ownerUserId, string targetEmail)
   {
+    await using var db = await dbFactory.CreateDbContextAsync();
     var list = await db.TodoLists.FirstOrDefaultAsync(l => l.Id == listId && l.OwnerId == ownerUserId);
     if(list is null) return;
 
@@ -114,6 +122,7 @@ public class TodoService(ApplicationDbContext db, IHubContext<TodoHub> hub , Use
 
   public async Task ToggleCompleteAsync(Guid itemId, string userId)
   {
+    await using var db = await dbFactory.CreateDbContextAsync();
     var item = await db.TodoItems.FindAsync(itemId);
     if(item is null) return;
 
@@ -125,6 +134,7 @@ public class TodoService(ApplicationDbContext db, IHubContext<TodoHub> hub , Use
 
   public async Task UpdateDescriptionAsync(Guid itemId, string? description, string userId)
   {
+    await using var db = await dbFactory.CreateDbContextAsync();
     var item = await db.TodoItems.FirstOrDefaultAsync(i => i.Id == itemId &&
                                                     (i.List.OwnerId == userId || i.List.Shares.Any(s => s.UserId == userId)));
     if(item is null) return;
