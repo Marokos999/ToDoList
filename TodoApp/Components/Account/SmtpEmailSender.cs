@@ -1,9 +1,11 @@
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using TodoApp.Data;
+using TodoApp.Resources;
 
 namespace TodoApp.Components.Account;
 
@@ -20,16 +22,16 @@ public sealed class SmtpOptions
         !string.IsNullOrEmpty(Host) && !string.IsNullOrEmpty(UserName) && !string.IsNullOrEmpty(Password);
 }
 
-internal sealed class SmtpEmailSender(IOptions<SmtpOptions> options) : IEmailSender<ApplicationUser>
+internal sealed class SmtpEmailSender(IOptions<SmtpOptions> options, IStringLocalizer<SharedResource> localizer) : IEmailSender<ApplicationUser>
 {
     public Task SendConfirmationLinkAsync(ApplicationUser user, string email, string confirmationLink) =>
-        SendAsync(email, "Potvrdi nalog", $"Potvrdi svoj nalog <a href='{confirmationLink}'>klikom ovde</a>.");
+        SendAsync(email, localizer["EmailConfirmSubject"], localizer["EmailConfirmBody", confirmationLink]);
 
     public Task SendPasswordResetLinkAsync(ApplicationUser user, string email, string resetLink) =>
-        SendAsync(email, "Resetovanje lozinke", $"Lozinku možeš da resetuješ <a href='{resetLink}'>klikom ovde</a>.");
+        SendAsync(email, localizer["EmailResetSubject"], localizer["EmailResetLinkBody", resetLink]);
 
     public Task SendPasswordResetCodeAsync(ApplicationUser user, string email, string resetCode) =>
-        SendAsync(email, "Resetovanje lozinke", $"Kod za resetovanje lozinke: {resetCode}");
+        SendAsync(email, localizer["EmailResetSubject"], localizer["EmailResetCodeBody", resetCode]);
 
     private async Task SendAsync(string to, string subject, string htmlBody)
     {

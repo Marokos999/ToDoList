@@ -7,8 +7,9 @@
 @inject NavigationManager Nav
 @inject TodoNotifier Notifier
 @inject DialogService DialogService
+@inject IStringLocalizer<SharedResource> L
 
-<PageTitle>@(list?.Name ?? "Lista")</PageTitle>
+<PageTitle>@(list?.Name ?? L["List"].Value)</PageTitle>
 
 <div class="container mt-4">
     <div class="d-flex align-items-center gap-3 mb-4">
@@ -17,8 +18,8 @@
         {
             <form class="d-flex align-items-center gap-2 flex-grow-1" @onsubmit="SaveName" @onsubmit:preventDefault>
                 <RadzenTextBox @bind-Value="nameDraft" Style="width:100%; max-width:400px" />
-                <RadzenButton Text="Sačuvaj" ButtonType="ButtonType.Submit" />
-                <RadzenButton Text="Odustani" ButtonStyle="ButtonStyle.Light" Click="@(() => isRenaming = false)" />
+                <RadzenButton Text="@L["Save"]" ButtonType="ButtonType.Submit" />
+                <RadzenButton Text="@L["Cancel"]" ButtonStyle="ButtonStyle.Light" Click="@(() => isRenaming = false)" />
                 @if (!string.IsNullOrEmpty(nameError))
                 {
                     <small class="text-danger">@nameError</small>
@@ -30,19 +31,19 @@
             <h3 class="mb-0">@(list?.Name ?? "...")</h3>
             @if (list?.OwnerId == userId)
             {
-                <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Click="StartRename" title="Preimenuj listu" />
-                <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Click="DeleteList" title="Obriši listu" Style="margin-left:auto" />
+                <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Click="StartRename" title="@L["RenameList"]" />
+                <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Click="DeleteList" title="@L["DeleteList"]" Style="margin-left:auto" />
             }
         }
     </div>
 
     @if (items is null)
     {
-        <p>Učitavanje...</p>
+        <p>@L["Loading"]</p>
     }
     else if (list is null)
     {
-        <p class="text-muted">Nemaš pristup ovoj listi ili ona ne postoji.</p>
+        <p class="text-muted">@L["NoAccess"]</p>
     }
     else
     {
@@ -51,16 +52,16 @@
             <form class="card-body" @onsubmit="AddItem" @onsubmit:preventDefault>
                 <div class="row g-2 align-items-end">
                     <div class="col-md-5">
-                        <label class="form-label">Naziv</label>
-                        <RadzenTextBox @bind-Value="newTitle" Placeholder="Novi zadatak..." Style="width:100%" />
+                        <label class="form-label">@L["Title"]</label>
+                        <RadzenTextBox @bind-Value="newTitle" Placeholder="@L["NewTaskPlaceholder"]" Style="width:100%" />
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label">Prioritet</label>
-                        <RadzenDropDown @bind-Value="newPriority" Data="@priorityOptions" TextProperty="Text" ValueProperty="Value" Style="width:100%" />
+                        <label class="form-label">@L["Priority"]</label>
+                        <RadzenDropDown @bind-Value="newPriority" Data="@PriorityOptions" TextProperty="Text" ValueProperty="Value" Style="width:100%" />
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label">Rok</label>
-                        <RadzenDatePicker @bind-Value="newDueDate" DateFormat="dd.MM.yyyy" Style="width:100%" />
+                        <label class="form-label">@L["DueDate"]</label>
+                        <RadzenDatePicker @bind-Value="newDueDate" DateFormat="@L["DateFormat"]" Style="width:100%" />
                     </div>
                     <div class="col-md-1">
                         <RadzenButton Icon="add" ButtonType="ButtonType.Submit" Disabled="@isSaving" Style="width:100%" />
@@ -76,23 +77,23 @@
         @* Lista taskova *@
         @if (!items.Any())
         {
-            <p class="text-muted">Nema zadataka. Dodajte prvi!</p>
+            <p class="text-muted">@L["NoTasksAddFirst"]</p>
         }
         else
         {
             <div class="mb-3">
                 <RadzenSelectBar @bind-Value="filter" Size="ButtonSize.Small">
                     <Items>
-                        <RadzenSelectBarItem Text="Svi" Value="@ItemFilter.All" />
-                        <RadzenSelectBarItem Text="Aktivni" Value="@ItemFilter.Active" />
-                        <RadzenSelectBarItem Text="Završeni" Value="@ItemFilter.Completed" />
+                        <RadzenSelectBarItem Text="@L["FilterAll"]" Value="@ItemFilter.All" />
+                        <RadzenSelectBarItem Text="@L["FilterActive"]" Value="@ItemFilter.Active" />
+                        <RadzenSelectBarItem Text="@L["FilterCompleted"]" Value="@ItemFilter.Completed" />
                     </Items>
                 </RadzenSelectBar>
             </div>
 
             @if (!VisibleItems.Any())
             {
-                <p class="text-muted">Nema zadataka u ovom prikazu.</p>
+                <p class="text-muted">@L["NoTasksInView"]</p>
             }
 
             @foreach (var item in VisibleItems)
@@ -115,7 +116,7 @@
                         @if (item.DueDate.HasValue)
                         {
                             <small class="@(IsOverdue(item) ? "text-danger fw-semibold" : "text-muted")"
-                                   title="@(IsOverdue(item) ? "Rok je prošao" : null)">@item.DueDate.Value.ToString("dd.MM.")</small>
+                                   title="@(IsOverdue(item) ? L["Overdue"].Value : null)">@item.DueDate.Value.ToString(L["ShortDateFormat"].Value)</small>
                         }
                         <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
                                       Size="ButtonSize.Small"
@@ -126,27 +127,27 @@
                         <form class="card-body pt-0" @onsubmit="@(() => SaveItem(item.Id))" @onsubmit:preventDefault>
                             <div class="row g-2 mb-2">
                                 <div class="col-md-6">
-                                    <label class="form-label">Naziv</label>
+                                    <label class="form-label">@L["Title"]</label>
                                     <RadzenTextBox @bind-Value="titleDraft" Style="width:100%" />
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label">Prioritet</label>
-                                    <RadzenDropDown @bind-Value="priorityDraft" Data="@priorityOptions" TextProperty="Text" ValueProperty="Value" Style="width:100%" />
+                                    <label class="form-label">@L["Priority"]</label>
+                                    <RadzenDropDown @bind-Value="priorityDraft" Data="@PriorityOptions" TextProperty="Text" ValueProperty="Value" Style="width:100%" />
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label">Rok</label>
-                                    <RadzenDatePicker @bind-Value="dueDateDraft" DateFormat="dd.MM.yyyy" AllowClear="true" Style="width:100%" />
+                                    <label class="form-label">@L["DueDate"]</label>
+                                    <RadzenDatePicker @bind-Value="dueDateDraft" DateFormat="@L["DateFormat"]" AllowClear="true" Style="width:100%" />
                                 </div>
                             </div>
-                            <label class="form-label">Opis</label>
-                            <RadzenTextArea @bind-Value="descriptionDraft" Placeholder="Dodaj opis..." Rows="3" Style="width:100%" />
+                            <label class="form-label">@L["Description"]</label>
+                            <RadzenTextArea @bind-Value="descriptionDraft" Placeholder="@L["AddDescriptionPlaceholder"]" Rows="3" Style="width:100%" />
                             <div class="d-flex justify-content-end align-items-center gap-2 mt-2">
                                 @if (!string.IsNullOrEmpty(editError))
                                 {
                                     <small class="text-danger me-auto">@editError</small>
                                 }
-                                <RadzenButton Text="Odustani" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small" Click="@(() => expandedItemId = null)" />
-                                <RadzenButton Text="Sačuvaj" ButtonType="ButtonType.Submit" Size="ButtonSize.Small" />
+                                <RadzenButton Text="@L["Cancel"]" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small" Click="@(() => expandedItemId = null)" />
+                                <RadzenButton Text="@L["Save"]" ButtonType="ButtonType.Submit" Size="ButtonSize.Small" />
                             </div>
                         </form>
                     }
@@ -158,10 +159,10 @@
         @if (list.OwnerId == userId)
         {
             <div class="mt-4">
-                <h6>Deli listu</h6>
+                <h6>@L["ShareList"]</h6>
                 <div class="d-flex gap-2">
-                    <RadzenTextBox @bind-Value="shareEmail" Placeholder="Email korisnika..." Style="width:300px" />
-                    <RadzenButton Text="Deli" Click="ShareList" />
+                    <RadzenTextBox @bind-Value="shareEmail" Placeholder="@L["UserEmailPlaceholder"]" Style="width:300px" />
+                    <RadzenButton Text="@L["Share"]" Click="ShareList" />
                 </div>
                 @if (!string.IsNullOrEmpty(shareMessage))
                 {
@@ -182,8 +183,6 @@
     private string newTitle = string.Empty;
     private Priority newPriority = Priority.Medium;
     private DateTime? newDueDate;
-    private static readonly List<PriorityOption> priorityOptions =
-        Enum.GetValues<Priority>().Select(p => new PriorityOption(p, GetPriorityName(p))).ToList();
     private bool isSaving;
     private string titleError = string.Empty;
     private ItemFilter filter = ItemFilter.All;
@@ -241,7 +240,7 @@
         if (isSaving) return;
         if (string.IsNullOrWhiteSpace(newTitle))
         {
-            titleError = "Unesi naziv zadatka.";
+            titleError = L["EnterTaskTitle"];
             return;
         }
 
@@ -263,9 +262,9 @@
     private async Task DeleteItem(TodoItem item)
     {
         var confirmed = await DialogService.Confirm(
-            @<span>Da li sigurno želiš da obrišeš zadatak „@item.Title“?</span>,
-            "Brisanje zadatka",
-            new ConfirmOptions { OkButtonText = "Obriši", CancelButtonText = "Odustani" });
+            @<span>@L["DeleteTaskConfirm", item.Title]</span>,
+            L["DeleteTaskTitle"],
+            new ConfirmOptions { OkButtonText = L["Delete"], CancelButtonText = L["Cancel"] });
         if (confirmed != true) return;
 
         await TodoService.DeleteItemAsync(item.Id, userId);
@@ -292,7 +291,7 @@
     {
         if (string.IsNullOrWhiteSpace(titleDraft))
         {
-            editError = "Unesi naziv zadatka.";
+            editError = L["EnterTaskTitle"];
             return;
         }
 
@@ -312,7 +311,7 @@
     {
         if (string.IsNullOrWhiteSpace(nameDraft))
         {
-            nameError = "Unesi naziv liste.";
+            nameError = L["EnterListName"];
             return;
         }
 
@@ -324,9 +323,9 @@
     private async Task DeleteList()
     {
         var confirmed = await DialogService.Confirm(
-            @<span>Da li sigurno želiš da obrišeš listu „@(list?.Name)“?</span>,
-            "Brisanje liste",
-            new ConfirmOptions { OkButtonText = "Obriši", CancelButtonText = "Odustani" });
+            @<span>@L["DeleteListConfirm", list?.Name ?? string.Empty]</span>,
+            L["DeleteListTitle"],
+            new ConfirmOptions { OkButtonText = L["Delete"], CancelButtonText = L["Cancel"] });
         if (confirmed != true) return;
 
         await TodoService.DeleteListAsync(ListId, userId);
@@ -338,7 +337,7 @@
         if (string.IsNullOrWhiteSpace(shareEmail))
         {
             shareSucceeded = false;
-            shareMessage = "Unesi email korisnika.";
+            shareMessage = L["EnterUserEmail"];
             return;
         }
 
@@ -346,11 +345,11 @@
         shareSucceeded = result == ShareResult.Shared;
         shareMessage = result switch
         {
-            ShareResult.Shared => "Lista je podeljena!",
-            ShareResult.UserNotFound => "Ne postoji korisnik sa tim emailom.",
-            ShareResult.AlreadyShared => "Lista je već podeljena sa tim korisnikom.",
-            ShareResult.SelfShare => "Ne možeš da podeliš listu sa sobom.",
-            _ => "Samo vlasnik može da deli listu."
+            ShareResult.Shared => L["ShareSucceeded"],
+            ShareResult.UserNotFound => L["ShareUserNotFound"],
+            ShareResult.AlreadyShared => L["ShareAlreadyShared"],
+            ShareResult.SelfShare => L["ShareSelf"],
+            _ => L["ShareNotOwner"]
         };
         if (shareSucceeded) shareEmail = string.Empty;
     }
@@ -362,12 +361,15 @@
         _ => BadgeStyle.Light
     };
 
-    private static string GetPriorityName(Priority p) => p switch
+    private string GetPriorityName(Priority p) => p switch
     {
-        Priority.High => "Visok",
-        Priority.Medium => "Srednji",
-        _ => "Nizak"
+        Priority.High => L["PriorityHigh"],
+        Priority.Medium => L["PriorityMedium"],
+        _ => L["PriorityLow"]
     };
+
+    private List<PriorityOption> PriorityOptions =>
+        Enum.GetValues<Priority>().Select(p => new PriorityOption(p, GetPriorityName(p))).ToList();
 
     private IEnumerable<TodoItem> VisibleItems => (items ?? [])
         .Where(i => filter switch

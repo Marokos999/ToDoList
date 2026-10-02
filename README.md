@@ -15,7 +15,7 @@ Real-time shared to-do lists built with **Blazor Server** on **.NET 10**. Create
 - Sharing a list with another registered user by email (owner only, with a clear message for every failure case)
 - Real-time updates: a change made by anyone on a shared list appears immediately for everyone viewing it
 - Access checks in the service layer, so only the owner and users the list is shared with can read or change it
-- Serbian UI for lists and tasks (`sr-Latn-RS` culture, `dd.MM.yyyy` dates)
+- Serbian and English UI with a language dropdown in the top bar; Serbian is the default, and dates and the calendar follow the selected language
 
 ## Tech stack
 

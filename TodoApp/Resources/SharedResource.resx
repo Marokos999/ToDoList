@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- Common -->
+  <data name="Loading" xml:space="preserve"><value>Učitavanje...</value></data>
+  <data name="Save" xml:space="preserve"><value>Sačuvaj</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Odustani</value></data>
+  <data name="Delete" xml:space="preserve"><value>Obriši</value></data>
+  <data name="Title" xml:space="preserve"><value>Naziv</value></data>
+  <data name="Priority" xml:space="preserve"><value>Prioritet</value></data>
+  <data name="DueDate" xml:space="preserve"><value>Rok</value></data>
+  <data name="Description" xml:space="preserve"><value>Opis</value></data>
+  <data name="DateFormat" xml:space="preserve"><value>dd.MM.yyyy</value></data>
+  <data name="ShortDateFormat" xml:space="preserve"><value>dd.MM.</value></data>
+  <data name="PriorityLow" xml:space="preserve"><value>Nizak</value></data>
+  <data name="PriorityMedium" xml:space="preserve"><value>Srednji</value></data>
+  <data name="PriorityHigh" xml:space="preserve"><value>Visok</value></data>
+  <data name="EnterListName" xml:space="preserve"><value>Unesi naziv liste.</value></data>
+  <data name="EnterTaskTitle" xml:space="preserve"><value>Unesi naziv zadatka.</value></data>
+
+  <!-- Home -->
+  <data name="MyLists" xml:space="preserve"><value>Moje liste</value></data>
+  <data name="MyTodoLists" xml:space="preserve"><value>Moje To-Do liste</value></data>
+  <data name="NewList" xml:space="preserve"><value>Nova lista</value></data>
+  <data name="NoListsYet" xml:space="preserve"><value>Nemate nijednu listu. Kreirajte prvu!</value></data>
+  <data name="SharedWithYou" xml:space="preserve"><value>Podeljeno sa tobom</value></data>
+  <data name="NoTasks" xml:space="preserve"><value>Nema zadataka</value></data>
+  <data name="DoneCount" xml:space="preserve"><value>{0}/{1} urađeno</value></data>
+  <data name="ListNamePlaceholder" xml:space="preserve"><value>Naziv liste...</value></data>
+  <data name="Create" xml:space="preserve"><value>Kreiraj</value></data>
+
+  <!-- List page -->
+  <data name="List" xml:space="preserve"><value>Lista</value></data>
+  <data name="RenameList" xml:space="preserve"><value>Preimenuj listu</value></data>
+  <data name="DeleteList" xml:space="preserve"><value>Obriši listu</value></data>
+  <data name="NoAccess" xml:space="preserve"><value>Nemaš pristup ovoj listi ili ona ne postoji.</value></data>
+  <data name="NewTaskPlaceholder" xml:space="preserve"><value>Novi zadatak...</value></data>
+  <data name="NoTasksAddFirst" xml:space="preserve"><value>Nema zadataka. Dodajte prvi!</value></data>
+  <data name="FilterAll" xml:space="preserve"><value>Svi</value></data>
+  <data name="FilterActive" xml:space="preserve"><value>Aktivni</value></data>
+  <data name="FilterCompleted" xml:space="preserve"><value>Završeni</value></data>
+  <data name="NoTasksInView" xml:space="preserve"><value>Nema zadataka u ovom prikazu.</value></data>
+  <data name="Overdue" xml:space="preserve"><value>Rok je prošao</value></data>
+  <data name="AddDescriptionPlaceholder" xml:space="preserve"><value>Dodaj opis...</value></data>
+  <data name="ShareList" xml:space="preserve"><value>Deli listu</value></data>
+  <data name="UserEmailPlaceholder" xml:space="preserve"><value>Email korisnika...</value></data>
+  <data name="Share" xml:space="preserve"><value>Deli</value></data>
+  <data name="EnterUserEmail" xml:space="preserve"><value>Unesi email korisnika.</value></data>
+  <data name="ShareSucceeded" xml:space="preserve"><value>Lista je podeljena!</value></data>
+  <data name="ShareUserNotFound" xml:space="preserve"><value>Ne postoji korisnik sa tim emailom.</value></data>
+  <data name="ShareAlreadyShared" xml:space="preserve"><value>Lista je već podeljena sa tim korisnikom.</value></data>
+  <data name="ShareSelf" xml:space="preserve"><value>Ne možeš da podeliš listu sa sobom.</value></data>
+  <data name="ShareNotOwner" xml:space="preserve"><value>Samo vlasnik može da deli listu.</value></data>
+  <data name="DeleteTaskTitle" xml:space="preserve"><value>Brisanje zadatka</value></data>
+  <data name="DeleteTaskConfirm" xml:space="preserve"><value>Da li sigurno želiš da obrišeš zadatak „{0}“?</value></data>
+  <data name="DeleteListTitle" xml:space="preserve"><value>Brisanje liste</value></data>
+  <data name="DeleteListConfirm" xml:space="preserve"><value>Da li sigurno želiš da obrišeš listu „{0}“?</value></data>
+
+  <!-- Layout and navigation -->
+  <data name="NavHome" xml:space="preserve"><value>Početna</value></data>
+  <data name="NavRegister" xml:space="preserve"><value>Registracija</value></data>
+  <data name="NavLogin" xml:space="preserve"><value>Prijava</value></data>
+  <data name="NavLogout" xml:space="preserve"><value>Odjava</value></data>
+  <data name="NavigationMenu" xml:space="preserve"><value>Navigacioni meni</value></data>
+  <data name="Language" xml:space="preserve"><value>Jezik</value></data>
+  <data name="UnhandledError" xml:space="preserve"><value>Došlo je do neočekivane greške.</value></data>
+  <data name="ReloadPage" xml:space="preserve"><value>Osveži stranicu</value></data>
+
+  <!-- Reconnect dialog -->
+  <data name="ReconnectRejoining" xml:space="preserve"><value>Ponovno povezivanje sa serverom...</value></data>
+  <data name="ReconnectRetryingIn" xml:space="preserve"><value>Povezivanje nije uspelo... novi pokušaj za</value></data>
+  <data name="ReconnectSeconds" xml:space="preserve"><value>s.</value></data>
+  <data name="ReconnectFailed" xml:space="preserve"><value>Povezivanje nije uspelo.</value></data>
+  <data name="ReconnectResumeFailed" xml:space="preserve"><value>Nastavak sesije nije uspeo.</value></data>
+  <data name="RetryOrReload" xml:space="preserve"><value>Pokušaj ponovo ili osveži stranicu.</value></data>
+  <data name="Retry" xml:space="preserve"><value>Pokušaj ponovo</value></data>
+  <data name="SessionPaused" xml:space="preserve"><value>Server je pauzirao sesiju.</value></data>
+  <data name="Resume" xml:space="preserve"><value>Nastavi</value></data>
+
+  <!-- Not found and error pages -->
+  <data name="NotFoundTitle" xml:space="preserve"><value>Stranica nije pronađena</value></data>
+  <data name="NotFoundText" xml:space="preserve"><value>Sadržaj koji tražiš ne postoji.</value></data>
+  <data name="ErrorTitle" xml:space="preserve"><value>Greška</value></data>
+  <data name="ErrorHeading" xml:space="preserve"><value>Greška.</value></data>
+  <data name="ErrorText" xml:space="preserve"><value>Došlo je do greške pri obradi zahteva.</value></data>
+
+  <!-- Emails -->
+  <data name="EmailConfirmSubject" xml:space="preserve"><value>Potvrdi nalog</value></data>
+  <data name="EmailConfirmBody" xml:space="preserve"><value>Potvrdi svoj nalog &lt;a href='{0}'&gt;klikom ovde&lt;/a&gt;.</value></data>
+  <data name="EmailResetSubject" xml:space="preserve"><value>Resetovanje lozinke</value></data>
+  <data name="EmailResetLinkBody" xml:space="preserve"><value>Lozinku možeš da resetuješ &lt;a href='{0}'&gt;klikom ovde&lt;/a&gt;.</value></data>
+  <data name="EmailResetCodeBody" xml:space="preserve"><value>Kod za resetovanje lozinke: {0}</value></data>
+</root>

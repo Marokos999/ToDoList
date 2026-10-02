@@ -1,4 +1,5 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
+@inject IStringLocalizer<SharedResource> L
 
 <div class="page">
     <div class="sidebar">
@@ -6,7 +7,9 @@
     </div>
 
     <main>
-        <div class="top-row px-4"></div>
+        <div class="top-row px-4">
+            <CultureSelector />
+        </div>
 
         <article class="content px-4">
             @Body
@@ -15,7 +18,7 @@
 </div>
 
 <div id="blazor-error-ui" data-nosnippet>
-    Došlo je do neočekivane greške.
-    <a href="." class="reload">Osveži stranicu</a>
+    @L["UnhandledError"]
+    <a href="." class="reload">@L["ReloadPage"]</a>
     <span class="dismiss">🗙</span>
 </div>

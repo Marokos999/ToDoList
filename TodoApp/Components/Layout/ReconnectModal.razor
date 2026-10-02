@@ -1,4 +1,6 @@
-﻿<script type="module" src="@Assets["Components/Layout/ReconnectModal.razor.js"]"></script>
+@inject IStringLocalizer<SharedResource> L
+
+<script type="module" src="@Assets["Components/Layout/ReconnectModal.razor.js"]"></script>
 
 <dialog id="components-reconnect-modal" data-nosnippet>
     <div class="components-reconnect-container">
@@ -7,25 +9,25 @@
             <div></div>
         </div>
         <p class="components-reconnect-first-attempt-visible">
-            Ponovno povezivanje sa serverom...
+            @L["ReconnectRejoining"]
         </p>
         <p class="components-reconnect-repeated-attempt-visible">
-            Povezivanje nije uspelo... novi pokušaj za <span id="components-seconds-to-next-attempt"></span> s.
+            @L["ReconnectRetryingIn"] <span id="components-seconds-to-next-attempt"></span> @L["ReconnectSeconds"]
         </p>
         <p class="components-reconnect-failed-visible">
-            Povezivanje nije uspelo.<br />Pokušaj ponovo ili osveži stranicu.
+            @L["ReconnectFailed"]<br />@L["RetryOrReload"]
         </p>
         <button id="components-reconnect-button" class="components-reconnect-failed-visible">
-            Pokušaj ponovo
+            @L["Retry"]
         </button>
         <p class="components-pause-visible">
-            Server je pauzirao sesiju.
+            @L["SessionPaused"]
         </p>
         <p class="components-resume-failed-visible">
-            Nastavak sesije nije uspeo.<br />Pokušaj ponovo ili osveži stranicu.
+            @L["ReconnectResumeFailed"]<br />@L["RetryOrReload"]
         </p>
         <button id="components-resume-button" class="components-pause-visible components-resume-failed-visible">
-            Nastavi
+            @L["Resume"]
         </button>
     </div>
 </dialog>

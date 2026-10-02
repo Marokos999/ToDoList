@@ -1,0 +1,11 @@
+@using System.Globalization
+@inject NavigationManager Nav
+@inject IStringLocalizer<SharedResource> L
+
+<form method="get" action="culture/set">
+    <input type="hidden" name="redirectUri" value="@Nav.ToBaseRelativePath(Nav.Uri)" />
+    <select name="culture" class="form-select form-select-sm" style="width:auto" aria-label="@L["Language"]" onchange="this.form.submit()">
+        <option value="sr-Latn-RS" selected="@(CultureInfo.CurrentUICulture.Name == "sr-Latn-RS")">Srpski</option>
+        <option value="en-US" selected="@(CultureInfo.CurrentUICulture.Name == "en-US")">English</option>
+    </select>
+</form>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- Common -->
+  <data name="Loading" xml:space="preserve"><value>Loading...</value></data>
+  <data name="Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Title" xml:space="preserve"><value>Title</value></data>
+  <data name="Priority" xml:space="preserve"><value>Priority</value></data>
+  <data name="DueDate" xml:space="preserve"><value>Due date</value></data>
+  <data name="Description" xml:space="preserve"><value>Description</value></data>
+  <data name="DateFormat" xml:space="preserve"><value>MM/dd/yyyy</value></data>
+  <data name="ShortDateFormat" xml:space="preserve"><value>MM/dd</value></data>
+  <data name="PriorityLow" xml:space="preserve"><value>Low</value></data>
+  <data name="PriorityMedium" xml:space="preserve"><value>Medium</value></data>
+  <data name="PriorityHigh" xml:space="preserve"><value>High</value></data>
+  <data name="EnterListName" xml:space="preserve"><value>Enter a list name.</value></data>
+  <data name="EnterTaskTitle" xml:space="preserve"><value>Enter a task title.</value></data>
+
+  <!-- Home -->
+  <data name="MyLists" xml:space="preserve"><value>My lists</value></data>
+  <data name="MyTodoLists" xml:space="preserve"><value>My to-do lists</value></data>
+  <data name="NewList" xml:space="preserve"><value>New list</value></data>
+  <data name="NoListsYet" xml:space="preserve"><value>You don't have any lists yet. Create your first one!</value></data>
+  <data name="SharedWithYou" xml:space="preserve"><value>Shared with you</value></data>
+  <data name="NoTasks" xml:space="preserve"><value>No tasks</value></data>
+  <data name="DoneCount" xml:space="preserve"><value>{0}/{1} done</value></data>
+  <data name="ListNamePlaceholder" xml:space="preserve"><value>List name...</value></data>
+  <data name="Create" xml:space="preserve"><value>Create</value></data>
+
+  <!-- List page -->
+  <data name="List" xml:space="preserve"><value>List</value></data>
+  <data name="RenameList" xml:space="preserve"><value>Rename list</value></data>
+  <data name="DeleteList" xml:space="preserve"><value>Delete list</value></data>
+  <data name="NoAccess" xml:space="preserve"><value>You don't have access to this list, or it doesn't exist.</value></data>
+  <data name="NewTaskPlaceholder" xml:space="preserve"><value>New task...</value></data>
+  <data name="NoTasksAddFirst" xml:space="preserve"><value>No tasks yet. Add the first one!</value></data>
+  <data name="FilterAll" xml:space="preserve"><value>All</value></data>
+  <data name="FilterActive" xml:space="preserve"><value>Active</value></data>
+  <data name="FilterCompleted" xml:space="preserve"><value>Completed</value></data>
+  <data name="NoTasksInView" xml:space="preserve"><value>No tasks in this view.</value></data>
+  <data name="Overdue" xml:space="preserve"><value>Overdue</value></data>
+  <data name="AddDescriptionPlaceholder" xml:space="preserve"><value>Add a description...</value></data>
+  <data name="ShareList" xml:space="preserve"><value>Share list</value></data>
+  <data name="UserEmailPlaceholder" xml:space="preserve"><value>User's email...</value></data>
+  <data name="Share" xml:space="preserve"><value>Share</value></data>
+  <data name="EnterUserEmail" xml:space="preserve"><value>Enter the user's email.</value></data>
+  <data name="ShareSucceeded" xml:space="preserve"><value>The list has been shared!</value></data>
+  <data name="ShareUserNotFound" xml:space="preserve"><value>There is no user with that email.</value></data>
+  <data name="ShareAlreadyShared" xml:space="preserve"><value>The list is already shared with that user.</value></data>
+  <data name="ShareSelf" xml:space="preserve"><value>You can't share a list with yourself.</value></data>
+  <data name="ShareNotOwner" xml:space="preserve"><value>Only the owner can share the list.</value></data>
+  <data name="DeleteTaskTitle" xml:space="preserve"><value>Delete task</value></data>
+  <data name="DeleteTaskConfirm" xml:space="preserve"><value>Are you sure you want to delete the task “{0}”?</value></data>
+  <data name="DeleteListTitle" xml:space="preserve"><value>Delete list</value></data>
+  <data name="DeleteListConfirm" xml:space="preserve"><value>Are you sure you want to delete the list “{0}”?</value></data>
+
+  <!-- Layout and navigation -->
+  <data name="NavHome" xml:space="preserve"><value>Home</value></data>
+  <data name="NavRegister" xml:space="preserve"><value>Register</value></data>
+  <data name="NavLogin" xml:space="preserve"><value>Login</value></data>
+  <data name="NavLogout" xml:space="preserve"><value>Logout</value></data>
+  <data name="NavigationMenu" xml:space="preserve"><value>Navigation menu</value></data>
+  <data name="Language" xml:space="preserve"><value>Language</value></data>
+  <data name="UnhandledError" xml:space="preserve"><value>An unhandled error has occurred.</value></data>
+  <data name="ReloadPage" xml:space="preserve"><value>Reload</value></data>
+
+  <!-- Reconnect dialog -->
+  <data name="ReconnectRejoining" xml:space="preserve"><value>Rejoining the server...</value></data>
+  <data name="ReconnectRetryingIn" xml:space="preserve"><value>Rejoin failed... trying again in</value></data>
+  <data name="ReconnectSeconds" xml:space="preserve"><value>seconds.</value></data>
+  <data name="ReconnectFailed" xml:space="preserve"><value>Failed to rejoin.</value></data>
+  <data name="ReconnectResumeFailed" xml:space="preserve"><value>Failed to resume the session.</value></data>
+  <data name="RetryOrReload" xml:space="preserve"><value>Please retry or reload the page.</value></data>
+  <data name="Retry" xml:space="preserve"><value>Retry</value></data>
+  <data name="SessionPaused" xml:space="preserve"><value>The session has been paused by the server.</value></data>
+  <data name="Resume" xml:space="preserve"><value>Resume</value></data>
+
+  <!-- Not found and error pages -->
+  <data name="NotFoundTitle" xml:space="preserve"><value>Not Found</value></data>
+  <data name="NotFoundText" xml:space="preserve"><value>Sorry, the content you are looking for does not exist.</value></data>
+  <data name="ErrorTitle" xml:space="preserve"><value>Error</value></data>
+  <data name="ErrorHeading" xml:space="preserve"><value>Error.</value></data>
+  <data name="ErrorText" xml:space="preserve"><value>An error occurred while processing your request.</value></data>
+
+  <!-- Emails -->
+  <data name="EmailConfirmSubject" xml:space="preserve"><value>Confirm your email</value></data>
+  <data name="EmailConfirmBody" xml:space="preserve"><value>Please confirm your account by &lt;a href='{0}'&gt;clicking here&lt;/a&gt;.</value></data>
+  <data name="EmailResetSubject" xml:space="preserve"><value>Reset your password</value></data>
+  <data name="EmailResetLinkBody" xml:space="preserve"><value>Please reset your password by &lt;a href='{0}'&gt;clicking here&lt;/a&gt;.</value></data>
+  <data name="EmailResetCodeBody" xml:space="preserve"><value>Please reset your password using the following code: {0}</value></data>
+</root>
