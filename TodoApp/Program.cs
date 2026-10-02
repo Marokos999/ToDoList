@@ -77,6 +77,7 @@ else
 
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
+app.UseRequestLocalization("sr-Latn-RS");
 app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
