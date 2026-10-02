@@ -80,7 +80,22 @@
         }
         else
         {
-            @foreach (var item in items)
+            <div class="mb-3">
+                <RadzenSelectBar @bind-Value="filter" Size="ButtonSize.Small">
+                    <Items>
+                        <RadzenSelectBarItem Text="Svi" Value="@ItemFilter.All" />
+                        <RadzenSelectBarItem Text="Aktivni" Value="@ItemFilter.Active" />
+                        <RadzenSelectBarItem Text="Završeni" Value="@ItemFilter.Completed" />
+                    </Items>
+                </RadzenSelectBar>
+            </div>
+
+            @if (!VisibleItems.Any())
+            {
+                <p class="text-muted">Nema zadataka u ovom prikazu.</p>
+            }
+
+            @foreach (var item in VisibleItems)
             {
                 <div class="card mb-2 shadow-sm @(item.IsCompleted ? "opacity-50" : "")">
                     <div class="card-body py-2 d-flex align-items-center gap-3">
@@ -99,7 +114,8 @@
                                      BadgeStyle="@GetBadgeStyle(item.Priority)" />
                         @if (item.DueDate.HasValue)
                         {
-                            <small class="text-muted">@item.DueDate.Value.ToString("dd.MM.")</small>
+                            <small class="@(IsOverdue(item) ? "text-danger fw-semibold" : "text-muted")"
+                                   title="@(IsOverdue(item) ? "Rok je prošao" : null)">@item.DueDate.Value.ToString("dd.MM.")</small>
                         }
                         <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
                                       Size="ButtonSize.Small"
@@ -170,6 +186,7 @@
         Enum.GetValues<Priority>().Select(p => new PriorityOption(p, GetPriorityName(p))).ToList();
     private bool isSaving;
     private string titleError = string.Empty;
+    private ItemFilter filter = ItemFilter.All;
 
     private string shareEmail = string.Empty;
     private string shareMessage = string.Empty;
@@ -359,7 +376,21 @@
         _ => "Nizak"
     };
 
+    private IEnumerable<TodoItem> VisibleItems => (items ?? [])
+        .Where(i => filter switch
+        {
+            ItemFilter.Active => !i.IsCompleted,
+            ItemFilter.Completed => i.IsCompleted,
+            _ => true
+        })
+        .OrderBy(i => i.IsCompleted);
+
+    private static bool IsOverdue(TodoItem item) =>
+        !item.IsCompleted && item.DueDate is { } due && due.Date < DateTime.Today;
+
     private record PriorityOption(Priority Value, string Text);
+
+    private enum ItemFilter { All, Active, Completed }
 
     public async ValueTask DisposeAsync()
     {
