@@ -27,7 +27,7 @@
     {
         @* Forma za novi task *@
         <div class="card mb-4 shadow-sm">
-            <div class="card-body">
+            <form class="card-body" @onsubmit="AddItem" @onsubmit:preventDefault>
                 <div class="row g-2 align-items-end">
                     <div class="col-md-5">
                         <label class="form-label">Naziv</label>
@@ -47,10 +47,14 @@
                         <RadzenDatePicker @bind-Value="newDueDate" Style="width:100%" />
                     </div>
                     <div class="col-md-1">
-                        <RadzenButton Icon="add" Click="AddItem" Style="width:100%" />
+                        <RadzenButton Icon="add" ButtonType="ButtonType.Submit" Disabled="@isSaving" Style="width:100%" />
                     </div>
                 </div>
-            </div>
+                @if (!string.IsNullOrEmpty(titleError))
+                {
+                    <small class="text-danger d-block mt-1">@titleError</small>
+                }
+            </form>
         </div>
 
         @* Lista taskova *@
@@ -127,6 +131,8 @@
     private Priority newPriority = Priority.Medium;
     private DateTime? newDueDate;
     private List<Priority> priorities = Enum.GetValues<Priority>().ToList();
+    private bool isSaving;
+    private string titleError = string.Empty;
 
     private string shareEmail = string.Empty;
     private string shareMessage = string.Empty;
@@ -177,11 +183,20 @@
 
     private async Task AddItem()
     {
-        if (string.IsNullOrWhiteSpace(newTitle)) return;
-        await TodoService.AddItemAsync(ListId, newTitle, newPriority, newDueDate, userId);
+        if (isSaving) return;
+        if (string.IsNullOrWhiteSpace(newTitle))
+        {
+            titleError = "Unesi naziv zadatka.";
+            return;
+        }
+
+        isSaving = true;
+        titleError = string.Empty;
+        await TodoService.AddItemAsync(ListId, newTitle.Trim(), newPriority, newDueDate, userId);
         await LoadItems();
         newTitle = string.Empty;
         newDueDate = null;
+        isSaving = false;
     }
 
     private async Task ToggleItem(Guid itemId)
