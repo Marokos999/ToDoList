@@ -48,9 +48,18 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
 
 builder.Services.AddSignalR();
 builder.Services.AddRadzenComponents();
-builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+var smtpSection = builder.Configuration.GetSection("Smtp");
+builder.Services.Configure<SmtpOptions>(smtpSection);
+var smtpConfigured = smtpSection.Get<SmtpOptions>()?.IsConfigured == true;
+if (smtpConfigured)
+    builder.Services.AddSingleton<IEmailSender<ApplicationUser>, SmtpEmailSender>();
+else
+    builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
 var app = builder.Build();
+
+if (!smtpConfigured)
+    app.Logger.LogWarning("SMTP is not configured: emails are not sent and confirmation links are shown on the page.");
 
 using (var scope = app.Services.CreateScope())
 {

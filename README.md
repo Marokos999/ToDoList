@@ -10,7 +10,7 @@ docker compose up --build
 
 App: http://localhost:8081 (Postgres is exposed on `localhost:5433`).
 
-EF Core migrations are applied automatically on startup. New accounts require email confirmation; since no email is sent, the confirmation link is shown on the registration confirmation page.
+EF Core migrations are applied automatically on startup. New accounts require email confirmation. Emails are sent over SMTP when `SMTP_USERNAME` and `SMTP_PASSWORD` are set in `.env` (e.g. a Gmail app password); otherwise the confirmation link is shown on the registration confirmation page.
 
 Settings (DB credentials, app port) can be overridden by copying `.env.example` to `.env`.
 
