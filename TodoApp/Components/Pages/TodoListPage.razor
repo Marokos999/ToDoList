@@ -35,12 +35,7 @@
                     </div>
                     <div class="col-md-3">
                         <label class="form-label">Prioritet</label>
-                        <select class="form-select" @bind="newPriority">
-                            @foreach (var p in priorities)
-                            {
-                                <option value="@p">@p</option>
-                            }
-                        </select>
+                        <RadzenDropDown @bind-Value="newPriority" Data="@priorityOptions" TextProperty="Text" ValueProperty="Value" Style="width:100%" />
                     </div>
                     <div class="col-md-3">
                         <label class="form-label">Rok</label>
@@ -79,7 +74,7 @@
                                 <RadzenIcon Icon="notes" Style="font-size:1rem; vertical-align:middle; margin-left:.25rem; opacity:.6" />
                             }
                         </span>
-                        <RadzenBadge Text="@item.Priority.ToString()"
+                        <RadzenBadge Text="@GetPriorityName(item.Priority)"
                                      BadgeStyle="@GetBadgeStyle(item.Priority)" />
                         @if (item.DueDate.HasValue)
                         {
@@ -130,7 +125,8 @@
     private string newTitle = string.Empty;
     private Priority newPriority = Priority.Medium;
     private DateTime? newDueDate;
-    private List<Priority> priorities = Enum.GetValues<Priority>().ToList();
+    private static readonly List<PriorityOption> priorityOptions =
+        Enum.GetValues<Priority>().Select(p => new PriorityOption(p, GetPriorityName(p))).ToList();
     private bool isSaving;
     private string titleError = string.Empty;
 
@@ -258,6 +254,15 @@
         Priority.Medium => BadgeStyle.Warning,
         _ => BadgeStyle.Light
     };
+
+    private static string GetPriorityName(Priority p) => p switch
+    {
+        Priority.High => "Visok",
+        Priority.Medium => "Srednji",
+        _ => "Nizak"
+    };
+
+    private record PriorityOption(Priority Value, string Text);
 
     public async ValueTask DisposeAsync()
     {
