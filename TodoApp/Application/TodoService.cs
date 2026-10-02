@@ -1,13 +1,11 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using TodoApp.Data;
 using TodoApp.Domain;
-using TodoApp.Hubs;
 
 namespace TodoApp.Application;
 
-public class TodoService(IDbContextFactory<ApplicationDbContext> dbFactory, IHubContext<TodoHub> hub , UserManager<ApplicationUser> userManager) : ITodoService
+public class TodoService(IDbContextFactory<ApplicationDbContext> dbFactory, TodoNotifier notifier,UserManager<ApplicationUser> userManager) : ITodoService
 {
   public async Task<TodoItem?> AddItemAsync(Guid listId, string title, Priority priority, DateTime? dueDate, string userId)
   {
@@ -28,7 +26,7 @@ public class TodoService(IDbContextFactory<ApplicationDbContext> dbFactory, IHub
 
     db.TodoItems.Add(item);
     await db.SaveChangesAsync();
-    await hub.Clients.Group(listId.ToString()).SendAsync("TaskChanged");
+    notifier.Notify(listId);
     return item;
   }
 
@@ -55,7 +53,7 @@ public class TodoService(IDbContextFactory<ApplicationDbContext> dbFactory, IHub
     var listId = item.ListId;
     db.TodoItems.Remove(item);
     await db.SaveChangesAsync();
-    await hub.Clients.Group(listId.ToString()).SendAsync("TaskChanged");
+    notifier.Notify(listId);
   }
 
   public async Task DeleteListAsync(Guid listId, string userId)
@@ -65,7 +63,7 @@ public class TodoService(IDbContextFactory<ApplicationDbContext> dbFactory, IHub
     if(list is null) return;
     list.IsDeleted = true;
     await db.SaveChangesAsync();
-    await hub.Clients.Group(listId.ToString()).SendAsync("TaskChanged");
+    notifier.Notify(listId);
   }
 
   public async Task<List<TodoItem>> GetItemsAsync(Guid listId, string userId)
@@ -104,7 +102,7 @@ public class TodoService(IDbContextFactory<ApplicationDbContext> dbFactory, IHub
 
     list.Name = name.Trim();
     await db.SaveChangesAsync();
-    await hub.Clients.Group(listId.ToString()).SendAsync("TaskChanged");
+    notifier.Notify(listId);
   }
 
   public async Task<ShareResult> ShareListAsync(Guid listId, string ownerUserId, string targetEmail)
@@ -136,7 +134,7 @@ public class TodoService(IDbContextFactory<ApplicationDbContext> dbFactory, IHub
     item.IsCompleted = !item.IsCompleted;
     item.CompletedAt =  item.IsCompleted ? DateTime.UtcNow : null;
     await db.SaveChangesAsync();
-    await hub.Clients.Group(item.ListId.ToString()).SendAsync("TaskChanged");
+    notifier.Notify(item.ListId);
   }
 
   public async Task UpdateItemAsync(Guid itemId, string title, Priority priority, DateTime? dueDate, string? description, string userId)
@@ -150,7 +148,7 @@ public class TodoService(IDbContextFactory<ApplicationDbContext> dbFactory, IHub
     item.DueDate = dueDate;
     item.Description = string.IsNullOrWhiteSpace(description) ? null : description.Trim();
     await db.SaveChangesAsync();
-    await hub.Clients.Group(item.ListId.ToString()).SendAsync("TaskChanged");
+    notifier.Notify(item.ListId);
   }
 
   private static IQueryable<TodoList> AccessibleLists(ApplicationDbContext db, string userId) =>

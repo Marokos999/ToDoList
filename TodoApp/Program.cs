@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using TodoApp.Components;
 using TodoApp.Components.Account;
 using TodoApp.Data;
-using TodoApp.Hubs;
 using TodoApp.Application;
 using Radzen;
 
@@ -44,7 +43,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
     .AddSignInManager()
     .AddDefaultTokenProviders();
 
-builder.Services.AddSignalR();
+builder.Services.AddSingleton<TodoNotifier>();
 builder.Services.AddRadzenComponents();
 var smtpSection = builder.Configuration.GetSection("Smtp");
 builder.Services.Configure<SmtpOptions>(smtpSection);
@@ -81,6 +80,5 @@ app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 app.MapAdditionalIdentityEndpoints();
-app.MapHub<TodoHub>("/todohub");
 
 app.Run();

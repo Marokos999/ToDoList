@@ -142,17 +142,33 @@ public sealed class TodoServiceTests(PostgresFixture fixture) : IClassFixture<Po
     }
 
     [Fact]
-    public async Task ItemChanges_NotifyTheListGroup()
+    public async Task ItemAndListChanges_NotifySubscribers()
     {
         var owner = await CreateUserAsync();
         var list = await service.CreateListAsync("List", owner.Id);
+        var notifications = 0;
+        Task OnChanged(Guid listId)
+        {
+            if (listId == list.Id) notifications++;
+            return Task.CompletedTask;
+        }
 
-        var item = await service.AddItemAsync(list.Id, "Task", Priority.Medium, null, owner.Id);
-        await service.ToggleCompleteAsync(item!.Id, owner.Id);
-        await service.UpdateItemAsync(item.Id, "Task", Priority.High, null, null, owner.Id);
-        await service.DeleteItemAsync(item.Id, owner.Id);
+        fixture.Notifier.ListChanged += OnChanged;
+        try
+        {
+            var item = await service.AddItemAsync(list.Id, "Task", Priority.Medium, null, owner.Id);
+            await service.ToggleCompleteAsync(item!.Id, owner.Id);
+            await service.UpdateItemAsync(item.Id, "Task", Priority.High, null, null, owner.Id);
+            await service.DeleteItemAsync(item.Id, owner.Id);
+            await service.RenameListAsync(list.Id, "Renamed", owner.Id);
+            await service.DeleteListAsync(list.Id, owner.Id);
+        }
+        finally
+        {
+            fixture.Notifier.ListChanged -= OnChanged;
+        }
 
-        Assert.Equal(4, fixture.Hub.Sent.Count(s => s == (list.Id.ToString(), "TaskChanged")));
+        Assert.Equal(6, notifications);
     }
 
     [Fact]

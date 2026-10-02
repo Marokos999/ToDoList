@@ -1,11 +1,9 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.PostgreSql;
 using TodoApp.Application;
 using TodoApp.Data;
-using TodoApp.Hubs;
 
 namespace TodoApp.Tests;
 
@@ -15,7 +13,7 @@ public sealed class PostgresFixture : IAsyncLifetime
 
     private ServiceProvider services = null!;
 
-    public FakeHubContext Hub { get; } = new();
+    public TodoNotifier Notifier => services.GetRequiredService<TodoNotifier>();
 
     public PostgresFixture()
     {
@@ -33,7 +31,7 @@ public sealed class PostgresFixture : IAsyncLifetime
         // Must match Program.cs, otherwise the model (passkeys table) differs from the migrations
         collection.AddIdentityCore<ApplicationUser>(options => options.Stores.SchemaVersion = IdentitySchemaVersions.Version3)
                   .AddEntityFrameworkStores<ApplicationDbContext>();
-        collection.AddSingleton<IHubContext<TodoHub>>(Hub);
+        collection.AddSingleton<TodoNotifier>();
         collection.AddScoped<ITodoService, TodoService>();
         services = collection.BuildServiceProvider();
 

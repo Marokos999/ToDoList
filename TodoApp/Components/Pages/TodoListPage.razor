@@ -1,11 +1,11 @@
 @page "/list/{ListId:guid}"
 @attribute [Authorize]
 @rendermode InteractiveServer
-@implements IAsyncDisposable
+@implements IDisposable
 @inject ITodoService TodoService
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Nav
-@inject IConfiguration Config
+@inject TodoNotifier Notifier
 @inject DialogService DialogService
 
 <PageTitle>@(list?.Name ?? "Lista")</PageTitle>
@@ -203,8 +203,6 @@
     private string nameDraft = string.Empty;
     private string nameError = string.Empty;
 
-    private HubConnection? hubConnection;
-
     protected override async Task OnInitializedAsync()
     {
         var auth = await AuthStateProvider.GetAuthenticationStateAsync();
@@ -212,25 +210,20 @@
         await LoadData();
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    // OnAfterRender doesn't run during prerendering, so only the interactive instance subscribes
+    protected override void OnAfterRender(bool firstRender)
     {
-        if (!firstRender) return;
+        if (firstRender)
+            Notifier.ListChanged += OnListChanged;
+    }
 
-        var hubUrl = Config["TodoHubUrl"] ?? Nav.ToAbsoluteUri("/todohub").ToString();
-
-        hubConnection = new HubConnectionBuilder()
-            .WithUrl(hubUrl)
-            .Build();
-
-        hubConnection.On("TaskChanged", () => InvokeAsync(async () =>
+    private Task OnListChanged(Guid listId) => listId != ListId
+        ? Task.CompletedTask
+        : InvokeAsync(async () =>
         {
             await LoadData();
             StateHasChanged();
-        }));
-
-        await hubConnection.StartAsync();
-        await hubConnection.SendAsync("JoinListAsync", ListId.ToString());
-    }
+        });
 
     private async Task LoadData()
     {
@@ -392,11 +385,5 @@
 
     private enum ItemFilter { All, Active, Completed }
 
-    public async ValueTask DisposeAsync()
-    {
-        if (hubConnection is not null)
-        {
-            await hubConnection.DisposeAsync();
-        }
-    }
+    public void Dispose() => Notifier.ListChanged -= OnListChanged;
 }

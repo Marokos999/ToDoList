@@ -21,8 +21,8 @@ Real-time shared to-do lists built with **Blazor Server** on **.NET 10**. Create
 
 | Area | Technology |
 | --- | --- |
-| UI | Blazor Server (Interactive Server render mode), Radzen.Blazor |
-| Backend | ASP.NET Core 10, ASP.NET Core Identity, SignalR |
+| UI | Blazor Server (Interactive Server render mode over SignalR), Radzen.Blazor |
+| Backend | ASP.NET Core 10, ASP.NET Core Identity |
 | Data | EF Core 10 + Npgsql, PostgreSQL (17 in Docker, Neon in production) |
 | Email | MailKit (SMTP) |
 | DevOps | Docker Compose, GitHub Actions, Azure App Service |
@@ -36,24 +36,23 @@ TodoListPage (Blazor component, runs on the server)
 TodoService ──── IDbContextFactory ────► PostgreSQL
    │  after every change
    ▼
-IHubContext<TodoHub> ── "TaskChanged" ──► SignalR group for that list
-                                              │
-                                              ▼
-                        every page viewing the list reloads its data
+TodoNotifier (singleton) ── ListChanged(listId) ──► every open page of that list
+                                                        │  reloads its data
+                                                        ▼
+                                  Blazor sends the UI update over the page's circuit
 ```
 
 - **One DbContext per operation.** A Blazor Server circuit lives as long as the tab is open, so a scoped `DbContext` would keep stale entities and fail when two events overlap. `TodoService` creates a short-lived context for every call through `IDbContextFactory`.
-- **A SignalR group per list.** Each open list page joins the group named after the list ID, so notifications only reach people looking at that list.
-- **Own changes don't wait for the hub.** The page reloads its data right after its own actions; the hub only brings in changes from other tabs and users.
+- **No extra SignalR connection for real-time.** Blazor Server components already run on the server, so `TodoService` raises an in-memory event on a singleton `TodoNotifier`. Every open page of that list reloads itself, and Blazor pushes the change to its browser over the circuit it already has. The notifier doesn't wait for subscribers and isolates their failures. This works within one server instance; scaling out would need a backplane such as Redis.
+- **Own changes are shown immediately.** The page reloads its data right after its own actions; notifications only bring in changes from other tabs and users.
 
 ## Project structure
 
 ```text
 TodoApp/
-├── Application/   TodoService, ITodoService, ShareResult
+├── Application/   TodoService, ITodoService, TodoNotifier, ListSummary, ShareResult
 ├── Domain/        TodoList, TodoItem, TodoListShare, Priority
 ├── Data/          ApplicationDbContext, ApplicationUser
-├── Hubs/          TodoHub
 ├── Components/    Pages (Home, TodoListPage), Account (Identity UI, SMTP sender), Layout
 └── Migrations/    EF Core migrations, applied automatically on startup
 TodoApp.Tests/     xUnit tests for TodoService against a real PostgreSQL (Testcontainers)
@@ -95,7 +94,7 @@ dotnet user-secrets set "Smtp:Password" "your-app-password" --project TodoApp
 dotnet test TodoApp.Tests
 ```
 
-The tests start a PostgreSQL 17 container with Testcontainers (Docker must be running), apply the real migrations and cover access rules, sharing, task changes and SignalR notifications.
+The tests start a PostgreSQL 17 container with Testcontainers (Docker must be running), apply the real migrations and cover access rules, sharing, task and list changes, and change notifications.
 
 ## Configuration
 
@@ -105,7 +104,6 @@ The tests start a PostgreSQL 17 container with Testcontainers (Docker must be ru
 | `Smtp__UserName`, `Smtp__Password` | SMTP credentials; without them no emails are sent |
 | `Smtp__Host`, `Smtp__Port` | Optional, default to `smtp.gmail.com` and `587` |
 | `Smtp__FromAddress`, `Smtp__FromName` | Optional sender address (defaults to the user name) and display name (defaults to `TodoApp`) |
-| `TodoHubUrl` | Hub URL for the page's server-side SignalR client. Only needed when the public URL isn't reachable from inside the app, as in Docker (set in `docker-compose.yml`) |
 
 ## Deployment
 
