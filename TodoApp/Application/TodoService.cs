@@ -123,4 +123,15 @@ public class TodoService(ApplicationDbContext db, IHubContext<TodoHub> hub , Use
     await hub.Clients.Group(item.ListId.ToString()).SendAsync("TaskChanged");
   }
 
+  public async Task UpdateDescriptionAsync(Guid itemId, string? description, string userId)
+  {
+    var item = await db.TodoItems.FirstOrDefaultAsync(i => i.Id == itemId &&
+                                                    (i.List.OwnerId == userId || i.List.Shares.Any(s => s.UserId == userId)));
+    if(item is null) return;
+
+    item.Description = string.IsNullOrWhiteSpace(description) ? null : description.Trim();
+    await db.SaveChangesAsync();
+    await hub.Clients.Group(item.ListId.ToString()).SendAsync("TaskChanged");
+  }
+
 }

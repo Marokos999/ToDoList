@@ -61,8 +61,13 @@
                     <RadzenCheckBox Value="@item.IsCompleted"
                                     TValue="bool"
                                     Change="@(_ => ToggleItem(item.Id))" />
-                    <span class="flex-grow-1 @(item.IsCompleted ? "text-decoration-line-through" : "")">
+                    <span class="flex-grow-1 @(item.IsCompleted ? "text-decoration-line-through" : "")"
+                          style="cursor:pointer" @onclick="() => ToggleExpand(item)">
                         @item.Title
+                        @if (!string.IsNullOrEmpty(item.Description))
+                        {
+                            <RadzenIcon Icon="notes" Style="font-size:1rem; vertical-align:middle; margin-left:.25rem; opacity:.6" />
+                        }
                     </span>
                     <RadzenBadge Text="@item.Priority.ToString()"
                                  BadgeStyle="@GetBadgeStyle(item.Priority)" />
@@ -74,6 +79,15 @@
                                   Size="ButtonSize.Small"
                                   Click="@(() => DeleteItem(item.Id))" />
                 </div>
+                @if (expandedItemId == item.Id)
+                {
+                    <div class="card-body pt-0">
+                        <RadzenTextArea @bind-Value="descriptionDraft" Placeholder="Dodaj opis..." Rows="3" Style="width:100%" />
+                        <div class="d-flex justify-content-end mt-2">
+                            <RadzenButton Text="Sačuvaj" Size="ButtonSize.Small" Click="@(() => SaveDescription(item.Id))" />
+                        </div>
+                    </div>
+                }
             </div>
         }
     }
@@ -106,6 +120,9 @@
 
     private string shareEmail = string.Empty;
     private string shareMessage = string.Empty;
+
+    private Guid? expandedItemId;
+    private string descriptionDraft = string.Empty;
 
     private HubConnection? hubConnection;
 
@@ -163,6 +180,24 @@
     private async Task DeleteItem(Guid itemId)
     {
         await TodoService.DeleteItemAsync(itemId, userId);
+    }
+
+    private void ToggleExpand(TodoItem item)
+    {
+        if (expandedItemId == item.Id)
+        {
+            expandedItemId = null;
+            return;
+        }
+
+        expandedItemId = item.Id;
+        descriptionDraft = item.Description ?? string.Empty;
+    }
+
+    private async Task SaveDescription(Guid itemId)
+    {
+        await TodoService.UpdateDescriptionAsync(itemId, descriptionDraft, userId);
+        expandedItemId = null;
     }
 
     private async Task ShareList()

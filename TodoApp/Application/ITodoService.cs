@@ -13,6 +13,7 @@ public interface ITodoService
     Task<TodoItem> AddItemAsync(Guid listId, string title, Priority priority, DateTime? dueDate, string userId);
     Task ToggleCompleteAsync(Guid itemId, string userId);
     Task DeleteItemAsync(Guid itemId, string userId);
+    Task UpdateDescriptionAsync(Guid itemId, string? description, string userId);
 
     Task ShareListAsync(Guid listId, string ownerUserId, string targetEmail);
 }

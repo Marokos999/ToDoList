@@ -5,6 +5,7 @@ public class TodoItem
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid ListId { get; set; }
     public string Title { get; set; } = string.Empty;
+    public string? Description { get; set; }
     public bool IsCompleted { get; set; }
     public Priority Priority { get; set; } = Priority.Medium;
     public DateTime? DueDate { get; set; }
