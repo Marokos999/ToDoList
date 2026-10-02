@@ -107,12 +107,32 @@
                     </div>
                     @if (expandedItemId == item.Id)
                     {
-                        <div class="card-body pt-0">
-                            <RadzenTextArea @bind-Value="descriptionDraft" Placeholder="Dodaj opis..." Rows="3" Style="width:100%" />
-                            <div class="d-flex justify-content-end mt-2">
-                                <RadzenButton Text="Sačuvaj" Size="ButtonSize.Small" Click="@(() => SaveDescription(item.Id))" />
+                        <form class="card-body pt-0" @onsubmit="@(() => SaveItem(item.Id))" @onsubmit:preventDefault>
+                            <div class="row g-2 mb-2">
+                                <div class="col-md-6">
+                                    <label class="form-label">Naziv</label>
+                                    <RadzenTextBox @bind-Value="titleDraft" Style="width:100%" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Prioritet</label>
+                                    <RadzenDropDown @bind-Value="priorityDraft" Data="@priorityOptions" TextProperty="Text" ValueProperty="Value" Style="width:100%" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Rok</label>
+                                    <RadzenDatePicker @bind-Value="dueDateDraft" DateFormat="dd.MM.yyyy" AllowClear="true" Style="width:100%" />
+                                </div>
                             </div>
-                        </div>
+                            <label class="form-label">Opis</label>
+                            <RadzenTextArea @bind-Value="descriptionDraft" Placeholder="Dodaj opis..." Rows="3" Style="width:100%" />
+                            <div class="d-flex justify-content-end align-items-center gap-2 mt-2">
+                                @if (!string.IsNullOrEmpty(editError))
+                                {
+                                    <small class="text-danger me-auto">@editError</small>
+                                }
+                                <RadzenButton Text="Odustani" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small" Click="@(() => expandedItemId = null)" />
+                                <RadzenButton Text="Sačuvaj" ButtonType="ButtonType.Submit" Size="ButtonSize.Small" />
+                            </div>
+                        </form>
                     }
                 </div>
             }
@@ -156,7 +176,11 @@
     private bool shareSucceeded;
 
     private Guid? expandedItemId;
+    private string titleDraft = string.Empty;
+    private Priority priorityDraft;
+    private DateTime? dueDateDraft;
     private string descriptionDraft = string.Empty;
+    private string editError = string.Empty;
 
     private bool isRenaming;
     private string nameDraft = string.Empty;
@@ -247,12 +271,22 @@
         }
 
         expandedItemId = item.Id;
+        titleDraft = item.Title;
+        priorityDraft = item.Priority;
+        dueDateDraft = item.DueDate;
         descriptionDraft = item.Description ?? string.Empty;
+        editError = string.Empty;
     }
 
-    private async Task SaveDescription(Guid itemId)
+    private async Task SaveItem(Guid itemId)
     {
-        await TodoService.UpdateDescriptionAsync(itemId, descriptionDraft, userId);
+        if (string.IsNullOrWhiteSpace(titleDraft))
+        {
+            editError = "Unesi naziv zadatka.";
+            return;
+        }
+
+        await TodoService.UpdateItemAsync(itemId, titleDraft, priorityDraft, dueDateDraft, descriptionDraft, userId);
         await LoadItems();
         expandedItemId = null;
     }

@@ -144,12 +144,15 @@ public class TodoService(IDbContextFactory<ApplicationDbContext> dbFactory, IHub
     await hub.Clients.Group(item.ListId.ToString()).SendAsync("TaskChanged");
   }
 
-  public async Task UpdateDescriptionAsync(Guid itemId, string? description, string userId)
+  public async Task UpdateItemAsync(Guid itemId, string title, Priority priority, DateTime? dueDate, string? description, string userId)
   {
     await using var db = await dbFactory.CreateDbContextAsync();
     var item = await AccessibleItems(db, userId).FirstOrDefaultAsync(i => i.Id == itemId);
     if(item is null) return;
 
+    item.Title = title.Trim();
+    item.Priority = priority;
+    item.DueDate = dueDate;
     item.Description = string.IsNullOrWhiteSpace(description) ? null : description.Trim();
     await db.SaveChangesAsync();
     await hub.Clients.Group(item.ListId.ToString()).SendAsync("TaskChanged");
