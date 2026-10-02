@@ -4,7 +4,7 @@ namespace TodoApp.Application;
 
 public interface ITodoService
 {
-    Task<List<TodoList>> GetListsForUserAsync(string userId);
+    Task<List<ListSummary>> GetListsForUserAsync(string userId);
     Task<TodoList?> GetListAsync(Guid listId, string userId);
     Task<TodoList> CreateListAsync(string name, string userId);
     Task DeleteListAsync(Guid listId, string userId);

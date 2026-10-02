@@ -86,19 +86,14 @@ public class TodoService(IDbContextFactory<ApplicationDbContext> dbFactory, IHub
                   .FirstOrDefaultAsync(l => l.Id == listId);
   }
 
-  public async Task<List<TodoList>> GetListsForUserAsync(string userId)
+  public async Task<List<ListSummary>> GetListsForUserAsync(string userId)
   {
     await using var db = await dbFactory.CreateDbContextAsync();
-    var owner = await db.TodoLists
-                        .Where(i => i.OwnerId == userId)
-                        .ToListAsync();
-
-    var share = await db.TodoLists
-                        .Where(s => s.Shares.Any(a => a.UserId == userId))
-                        .ToListAsync();
-
-
-    return owner.Union(share).OrderByDescending(l => l.CreatedAt).ToList();
+    return await AccessibleLists(db, userId)
+                  .OrderByDescending(l => l.CreatedAt)
+                  .Select(l => new ListSummary(l.Id, l.Name, l.CreatedAt, l.OwnerId != userId,
+                                               l.Items.Count, l.Items.Count(i => i.IsCompleted)))
+                  .ToListAsync();
   }
 
   public async Task RenameListAsync(Guid listId, string name, string userId)

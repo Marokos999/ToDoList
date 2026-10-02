@@ -171,6 +171,25 @@ public sealed class TodoServiceTests(PostgresFixture fixture) : IClassFixture<Po
     }
 
     [Fact]
+    public async Task GetListsForUserAsync_ReturnsProgressAndSharedFlag()
+    {
+        var owner = await CreateUserAsync();
+        var friend = await CreateUserAsync();
+        var list = await service.CreateListAsync("Shared", owner.Id);
+        var done = await service.AddItemAsync(list.Id, "Done", Priority.Low, null, owner.Id);
+        await service.AddItemAsync(list.Id, "Open", Priority.Low, null, owner.Id);
+        await service.ToggleCompleteAsync(done!.Id, owner.Id);
+        await service.ShareListAsync(list.Id, owner.Id, friend.Email!);
+
+        var forOwner = Assert.Single(await service.GetListsForUserAsync(owner.Id));
+        var forFriend = Assert.Single(await service.GetListsForUserAsync(friend.Id));
+
+        Assert.False(forOwner.IsShared);
+        Assert.True(forFriend.IsShared);
+        Assert.Equal((1, 2), (forFriend.CompletedItems, forFriend.TotalItems));
+    }
+
+    [Fact]
     public async Task RenameListAsync_OnlyOwnerCanRename()
     {
         var owner = await CreateUserAsync();
