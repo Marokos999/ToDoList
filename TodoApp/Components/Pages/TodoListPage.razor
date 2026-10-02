@@ -6,6 +6,7 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Nav
 @inject IConfiguration Config
+@inject DialogService DialogService
 
 <PageTitle>@(list?.Name ?? "Lista")</PageTitle>
 
@@ -82,7 +83,7 @@
                         }
                         <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
                                       Size="ButtonSize.Small"
-                                      Click="@(() => DeleteItem(item.Id))" />
+                                      Click="@(() => DeleteItem(item))" />
                     </div>
                     @if (expandedItemId == item.Id)
                     {
@@ -201,9 +202,15 @@
         await LoadItems();
     }
 
-    private async Task DeleteItem(Guid itemId)
+    private async Task DeleteItem(TodoItem item)
     {
-        await TodoService.DeleteItemAsync(itemId, userId);
+        var confirmed = await DialogService.Confirm(
+            @<span>Da li sigurno želiš da obrišeš zadatak „@item.Title“?</span>,
+            "Brisanje zadatka",
+            new ConfirmOptions { OkButtonText = "Obriši", CancelButtonText = "Odustani" });
+        if (confirmed != true) return;
+
+        await TodoService.DeleteItemAsync(item.Id, userId);
         await LoadItems();
     }
 
