@@ -56,6 +56,7 @@ TodoApp/
 ├── Hubs/          TodoHub
 ├── Components/    Pages (Home, TodoListPage), Account (Identity UI, SMTP sender), Layout
 └── Migrations/    EF Core migrations, applied automatically on startup
+TodoApp.Tests/     xUnit tests for TodoService against a real PostgreSQL (Testcontainers)
 ```
 
 ## Run locally with Docker
@@ -88,6 +89,14 @@ dotnet user-secrets set "Smtp:UserName" "you@gmail.com" --project TodoApp
 dotnet user-secrets set "Smtp:Password" "your-app-password" --project TodoApp
 ```
 
+## Tests
+
+```bash
+dotnet test TodoApp.Tests
+```
+
+The tests start a PostgreSQL 17 container with Testcontainers (Docker must be running), apply the real migrations and cover access rules, sharing, task changes and SignalR notifications.
+
 ## Configuration
 
 | Setting | Description |
@@ -100,4 +109,4 @@ dotnet user-secrets set "Smtp:Password" "your-app-password" --project TodoApp
 
 ## Deployment
 
-Every push to `main` runs [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml), which publishes the app and deploys it to Azure App Service with a publish profile stored in GitHub secrets. In production, the Neon PostgreSQL connection string and the SMTP credentials are App Service environment variables, and migrations run on startup.
+Every push to `main` runs [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml): first the tests, then, only if they pass, it publishes the app and deploys it to Azure App Service with a publish profile stored in GitHub secrets. In production, the Neon PostgreSQL connection string and the SMTP credentials are App Service environment variables, and migrations run on startup.
