@@ -92,12 +92,12 @@
         }
     }
 
-    @* Dijeljenje liste *@
+    @* Deljenje liste *@
     <div class="mt-4">
-        <h6>Dijeli listu</h6>
+        <h6>Deli listu</h6>
         <div class="d-flex gap-2">
             <RadzenTextBox @bind-Value="shareEmail" Placeholder="Email korisnika..." Style="width:300px" />
-            <RadzenButton Text="Dijeli" Click="ShareList" />
+            <RadzenButton Text="Deli" Click="ShareList" />
         </div>
         @if (!string.IsNullOrEmpty(shareMessage))
         {
@@ -205,7 +205,7 @@
         if (string.IsNullOrWhiteSpace(shareEmail)) return;
         await TodoService.ShareListAsync(ListId, userId, shareEmail);
         shareEmail = string.Empty;
-        shareMessage = "Lista je podijeljena!";
+        shareMessage = "Lista je podeljena!";
     }
 
     private BadgeStyle GetBadgeStyle(Priority p) => p switch
