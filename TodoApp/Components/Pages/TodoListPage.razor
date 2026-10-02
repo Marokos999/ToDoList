@@ -154,11 +154,11 @@
             .WithUrl(hubUrl)
             .Build();
 
-        hubConnection.On("TaskChanged", async () =>
+        hubConnection.On("TaskChanged", () => InvokeAsync(async () =>
         {
             await LoadItems();
-            await InvokeAsync(StateHasChanged);
-        });
+            StateHasChanged();
+        }));
 
         await hubConnection.StartAsync();
         await hubConnection.SendAsync("JoinListAsync", ListId.ToString());
@@ -179,6 +179,7 @@
     {
         if (string.IsNullOrWhiteSpace(newTitle)) return;
         await TodoService.AddItemAsync(ListId, newTitle, newPriority, newDueDate, userId);
+        await LoadItems();
         newTitle = string.Empty;
         newDueDate = null;
     }
@@ -186,11 +187,13 @@
     private async Task ToggleItem(Guid itemId)
     {
         await TodoService.ToggleCompleteAsync(itemId, userId);
+        await LoadItems();
     }
 
     private async Task DeleteItem(Guid itemId)
     {
         await TodoService.DeleteItemAsync(itemId, userId);
+        await LoadItems();
     }
 
     private void ToggleExpand(TodoItem item)
@@ -208,6 +211,7 @@
     private async Task SaveDescription(Guid itemId)
     {
         await TodoService.UpdateDescriptionAsync(itemId, descriptionDraft, userId);
+        await LoadItems();
         expandedItemId = null;
     }
 
