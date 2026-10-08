@@ -240,6 +240,40 @@ namespace TodoApp.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("TodoApp.Domain.TodoAttachment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<byte[]>("Data")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ItemId")
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("Size")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ItemId");
+
+                    b.ToTable("TodoAttachments");
+                });
+
             modelBuilder.Entity("TodoApp.Domain.TodoItem", b =>
                 {
                     b.Property<Guid>("Id")
@@ -418,6 +452,17 @@ namespace TodoApp.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("TodoApp.Domain.TodoAttachment", b =>
+                {
+                    b.HasOne("TodoApp.Domain.TodoItem", "Item")
+                        .WithMany("Attachments")
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Item");
+                });
+
             modelBuilder.Entity("TodoApp.Domain.TodoItem", b =>
                 {
                     b.HasOne("TodoApp.Domain.TodoList", "List")
@@ -438,6 +483,11 @@ namespace TodoApp.Migrations
                         .IsRequired();
 
                     b.Navigation("List");
+                });
+
+            modelBuilder.Entity("TodoApp.Domain.TodoItem", b =>
+                {
+                    b.Navigation("Attachments");
                 });
 
             modelBuilder.Entity("TodoApp.Domain.TodoList", b =>

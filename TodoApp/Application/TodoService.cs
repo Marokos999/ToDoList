@@ -129,6 +129,112 @@ public class TodoService(IDbContextFactory<ApplicationDbContext> dbFactory, Todo
     notifier.Notify(moved.ListId);
   }
 
+  public async Task<List<AttachmentInfo>> GetAttachmentsAsync(Guid itemId, string userId)
+  {
+    await using var db = await dbFactory.CreateDbContextAsync();
+    if(!await AccessibleItems(db, userId).AnyAsync(i => i.Id == itemId)) return [];
+
+    return await db.TodoAttachments
+                  .Where(a => a.ItemId == itemId)
+                  .OrderBy(a => a.CreatedAt)
+                  .Select(a => new AttachmentInfo(a.Id, a.FileName, a.Size))
+                  .ToListAsync();
+  }
+
+  public async Task<TodoAttachment?> GetAttachmentAsync(Guid attachmentId, string userId)
+  {
+    await using var db = await dbFactory.CreateDbContextAsync();
+    return await db.TodoAttachments
+                  .Where(a => a.Id == attachmentId && AccessibleItems(db, userId).Any(i => i.Id == a.ItemId))
+                  .FirstOrDefaultAsync();
+  }
+
+  public async Task<bool> AddAttachmentAsync(Guid itemId, string fileName, string contentType, Stream content, string userId)
+  {
+    await using var db = await dbFactory.CreateDbContextAsync();
+    var item = await AccessibleItems(db, userId).FirstOrDefaultAsync(i => i.Id == itemId);
+    if(item is null) return false;
+
+    // The size cap is also enforced by the uploader; this is the final guard
+    using var buffer = new MemoryStream();
+    await content.CopyToAsync(buffer);
+    if(buffer.Length > ITodoService.MaxAttachmentBytes || buffer.Length == 0) return false;
+
+    db.TodoAttachments.Add(new TodoAttachment
+    {
+      ItemId = itemId,
+      FileName = Path.GetFileName(fileName),
+      ContentType = string.IsNullOrWhiteSpace(contentType) ? "application/octet-stream" : contentType,
+      Size = buffer.Length,
+      Data = buffer.ToArray()
+    });
+    await db.SaveChangesAsync();
+    notifier.Notify(item.ListId);
+    return true;
+  }
+
+  public async Task DeleteAttachmentAsync(Guid attachmentId, string userId)
+  {
+    await using var db = await dbFactory.CreateDbContextAsync();
+    var attachment = await db.TodoAttachments
+                            .Include(a => a.Item)
+                            .Where(a => a.Id == attachmentId && AccessibleItems(db, userId).Any(i => i.Id == a.ItemId))
+                            .FirstOrDefaultAsync();
+    if(attachment is null) return;
+
+    var listId = attachment.Item.ListId;
+    db.TodoAttachments.Remove(attachment);
+    await db.SaveChangesAsync();
+    notifier.Notify(listId);
+  }
+
+  public async Task<Dictionary<Guid, int>> GetAttachmentCountsAsync(Guid listId, string userId)
+  {
+    await using var db = await dbFactory.CreateDbContextAsync();
+    if(!await AccessibleLists(db, userId).AnyAsync(l => l.Id == listId)) return [];
+
+    return await db.TodoAttachments
+                  .Where(a => a.Item.ListId == listId)
+                  .GroupBy(a => a.ItemId)
+                  .ToDictionaryAsync(g => g.Key, g => g.Count());
+  }
+
+  public async Task<string?> ExportCsvAsync(Guid listId, string userId)
+  {
+    await using var db = await dbFactory.CreateDbContextAsync();
+    if(!await AccessibleLists(db, userId).AnyAsync(l => l.Id == listId)) return null;
+
+    var items = await db.TodoItems.Where(i => i.ListId == listId).OrderBy(i => i.Order).ToListAsync();
+    return TodoCsv.Write(items);
+  }
+
+  public async Task<int?> ImportCsvAsync(Guid listId, string csv, string userId)
+  {
+    await using var db = await dbFactory.CreateDbContextAsync();
+    if(!await AccessibleLists(db, userId).AnyAsync(l => l.Id == listId)) return null;
+
+    var tasks = TodoCsv.Read(csv);
+    if(tasks is null) return null;
+
+    var order = await db.TodoItems.Where(i => i.ListId == listId).MaxAsync(i => (int?)i.Order) ?? 0;
+    foreach(var t in tasks)
+      db.TodoItems.Add(new TodoItem
+      {
+        ListId = listId,
+        Title = t.Title,
+        Description = t.Description,
+        Priority = t.Priority,
+        DueDate = t.DueDate,
+        IsCompleted = t.IsCompleted,
+        CompletedAt = t.IsCompleted ? DateTime.UtcNow : null,
+        Order = ++order
+      });
+
+    await db.SaveChangesAsync();
+    notifier.Notify(listId);
+    return tasks.Count;
+  }
+
   public async Task<ShareResult> ShareListAsync(Guid listId, string ownerUserId, string targetEmail)
   {
     await using var db = await dbFactory.CreateDbContextAsync();

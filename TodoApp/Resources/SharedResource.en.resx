@@ -94,4 +94,15 @@
   <data name="EmailResetSubject" xml:space="preserve"><value>Reset your password</value></data>
   <data name="EmailResetLinkBody" xml:space="preserve"><value>Please reset your password by &lt;a href='{0}'&gt;clicking here&lt;/a&gt;.</value></data>
   <data name="EmailResetCodeBody" xml:space="preserve"><value>Please reset your password using the following code: {0}</value></data>
+  <data name="Export" xml:space="preserve"><value>Export CSV</value></data>
+  <data name="Import" xml:space="preserve"><value>Import CSV</value></data>
+  <data name="ImportSucceeded" xml:space="preserve"><value>Imported tasks: {0}</value></data>
+  <data name="ImportFailed" xml:space="preserve"><value>The file is not a valid CSV export (header row missing).</value></data>
+  <data name="Attachments" xml:space="preserve"><value>Attachments</value></data>
+  <data name="AttachFile" xml:space="preserve"><value>Add file</value></data>
+  <data name="AttachmentFailed" xml:space="preserve"><value>File “{0}” was not added (empty or larger than 5 MB).</value></data>
+  <data name="ExportPdf" xml:space="preserve"><value>Export PDF report</value></data>
+  <data name="ReportSummary" xml:space="preserve"><value>Total: {0} · Completed: {1} · Active: {2}</value></data>
+  <data name="ReportGenerated" xml:space="preserve"><value>Generated: {0}</value></data>
+  <data name="ReportAttachments" xml:space="preserve"><value>Attachments: {0}</value></data>
 </root>

@@ -162,6 +162,57 @@ public sealed class TodoServiceTests(PostgresFixture fixture) : IClassFixture<Po
     }
 
     [Fact]
+    public async Task Attachments_CanBeAddedDownloadedAndDeleted_OnlyByUsersWithAccess()
+    {
+        var owner = await CreateUserAsync();
+        var stranger = await CreateUserAsync();
+        var list = await service.CreateListAsync("List", owner.Id);
+        var item = await service.AddItemAsync(list.Id, "Task", Priority.Low, null, owner.Id);
+        var bytes = "hello"u8.ToArray();
+
+        Assert.False(await service.AddAttachmentAsync(item!.Id, "a.txt", "text/plain", new MemoryStream(bytes), stranger.Id));
+        Assert.True(await service.AddAttachmentAsync(item.Id, "../a.txt", "text/plain", new MemoryStream(bytes), owner.Id));
+        Assert.False(await service.AddAttachmentAsync(item.Id, "big.bin", "", new MemoryStream(new byte[ITodoService.MaxAttachmentBytes + 1]), owner.Id));
+
+        var info = Assert.Single(await service.GetAttachmentsAsync(item.Id, owner.Id));
+        Assert.Equal("a.txt", info.FileName);
+        Assert.Empty(await service.GetAttachmentsAsync(item.Id, stranger.Id));
+        Assert.Null(await service.GetAttachmentAsync(info.Id, stranger.Id));
+        Assert.Equal(bytes, (await service.GetAttachmentAsync(info.Id, owner.Id))!.Data);
+
+        await service.DeleteAttachmentAsync(info.Id, stranger.Id);
+        Assert.Single(await service.GetAttachmentsAsync(item.Id, owner.Id));
+        await service.DeleteAttachmentAsync(info.Id, owner.Id);
+        Assert.Empty(await service.GetAttachmentsAsync(item.Id, owner.Id));
+    }
+
+    [Fact]
+    public async Task CsvExportAndImport_RoundTripsTasks_AndRejectsInvalidFiles()
+    {
+        var owner = await CreateUserAsync();
+        var stranger = await CreateUserAsync();
+        var source = await service.CreateListAsync("Source", owner.Id);
+        var item = await service.AddItemAsync(source.Id, "Say \"hi\", =now", Priority.High, new DateTime(2026, 10, 11), owner.Id);
+        await service.UpdateItemAsync(item!.Id, item.Title, Priority.High, item.DueDate, "line1\nline2", owner.Id);
+        await service.ToggleCompleteAsync(item.Id, owner.Id);
+
+        var csv = await service.ExportCsvAsync(source.Id, owner.Id);
+        Assert.Null(await service.ExportCsvAsync(source.Id, stranger.Id));
+
+        var target = await service.CreateListAsync("Target", owner.Id);
+        Assert.Null(await service.ImportCsvAsync(target.Id, csv!, stranger.Id));
+        Assert.Null(await service.ImportCsvAsync(target.Id, "not,a,csv\n1,2,3", owner.Id));
+        Assert.Equal(1, await service.ImportCsvAsync(target.Id, csv!, owner.Id));
+
+        var imported = Assert.Single(await service.GetItemsAsync(target.Id, owner.Id));
+        Assert.Equal("Say \"hi\", =now", imported.Title);
+        Assert.Equal("line1\nline2", imported.Description);
+        Assert.Equal(Priority.High, imported.Priority);
+        Assert.Equal(new DateTime(2026, 10, 11), imported.DueDate);
+        Assert.True(imported.IsCompleted);
+    }
+
+    [Fact]
     public async Task ItemAndListChanges_NotifySubscribers()
     {
         var owner = await CreateUserAsync();

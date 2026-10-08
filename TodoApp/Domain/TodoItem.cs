@@ -13,4 +13,5 @@ public class TodoItem
     public int Order { get; set; }
 
     public TodoList List { get; set; } = null!;
+    public ICollection<TodoAttachment> Attachments { get; set; } = [];
 }

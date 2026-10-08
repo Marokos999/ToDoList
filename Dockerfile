@@ -16,6 +16,11 @@ RUN dotnet publish TodoApp/TodoApp.csproj -c Release -o /app/publish
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
 
+# QuestPDF (PDF report export) needs fontconfig and a font on Linux
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libfontconfig1 fonts-dejavu-core \
+    && rm -rf /var/lib/apt/lists/*
+
 # Writable dir for ASP.NET Data Protection keys (auth cookies survive container restarts when mounted as a volume)
 RUN mkdir -p /home/app/.aspnet/DataProtection-Keys \
     && chown -R app:app /home/app/.aspnet

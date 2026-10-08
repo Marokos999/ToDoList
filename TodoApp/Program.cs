@@ -7,6 +7,8 @@ using TodoApp.Components;
 using TodoApp.Components.Account;
 using TodoApp.Data;
 using TodoApp.Application;
+using Microsoft.Extensions.Localization;
+using TodoApp.Resources;
 using Radzen;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
@@ -102,5 +104,38 @@ app.MapGet("/culture/set", (string culture, string? redirectUri, HttpContext htt
     var target = "/" + redirectUri?.TrimStart('/');
     return Results.LocalRedirect(RedirectHttpResult.IsLocalUrl(target) ? target : "/");
 });
+
+app.MapGet("/api/attachments/{id:guid}", async (Guid id, HttpContext http, ITodoService todos) =>
+{
+    var attachment = await todos.GetAttachmentAsync(id, UserId(http));
+    if (attachment is null) return Results.NotFound();
+
+    // Attachments are user content: always download, never render inline
+    http.Response.Headers.XContentTypeOptions = "nosniff";
+    return Results.File(attachment.Data, attachment.ContentType, attachment.FileName);
+}).RequireAuthorization();
+
+app.MapGet("/api/lists/{id:guid}/export.csv", async (Guid id, HttpContext http, ITodoService todos) =>
+{
+    var csv = await todos.ExportCsvAsync(id, UserId(http));
+    if (csv is null) return Results.NotFound();
+
+    var bytes = new System.Text.UTF8Encoding(true).GetPreamble().Concat(System.Text.Encoding.UTF8.GetBytes(csv)).ToArray();
+    return Results.File(bytes, "text/csv", "tasks.csv");
+}).RequireAuthorization();
+
+app.MapGet("/api/lists/{id:guid}/export.pdf", async (Guid id, HttpContext http, ITodoService todos, IStringLocalizer<SharedResource> L) =>
+{
+    var userId = UserId(http);
+    var list = await todos.GetListAsync(id, userId);
+    if (list is null) return Results.NotFound();
+
+    var items = await todos.GetItemsAsync(id, userId);
+    var counts = await todos.GetAttachmentCountsAsync(id, userId);
+    return Results.File(TodoReport.Generate(list, items, counts, L), "application/pdf", "tasks.pdf");
+}).RequireAuthorization();
+
+static string UserId(HttpContext http) =>
+    http.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
 
 app.Run();

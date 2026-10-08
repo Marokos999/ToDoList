@@ -94,4 +94,15 @@
   <data name="EmailResetSubject" xml:space="preserve"><value>Resetovanje lozinke</value></data>
   <data name="EmailResetLinkBody" xml:space="preserve"><value>Lozinku možeš da resetuješ &lt;a href='{0}'&gt;klikom ovde&lt;/a&gt;.</value></data>
   <data name="EmailResetCodeBody" xml:space="preserve"><value>Kod za resetovanje lozinke: {0}</value></data>
+  <data name="Export" xml:space="preserve"><value>Izvezi CSV</value></data>
+  <data name="Import" xml:space="preserve"><value>Uvezi CSV</value></data>
+  <data name="ImportSucceeded" xml:space="preserve"><value>Uvezeno zadataka: {0}</value></data>
+  <data name="ImportFailed" xml:space="preserve"><value>Fajl nije validan CSV izvoz (nedostaje zaglavlje).</value></data>
+  <data name="Attachments" xml:space="preserve"><value>Prilozi</value></data>
+  <data name="AttachFile" xml:space="preserve"><value>Dodaj fajl</value></data>
+  <data name="AttachmentFailed" xml:space="preserve"><value>Fajl „{0}“ nije dodat (prazan je ili veći od 5 MB).</value></data>
+  <data name="ExportPdf" xml:space="preserve"><value>Izvezi PDF izveštaj</value></data>
+  <data name="ReportSummary" xml:space="preserve"><value>Ukupno: {0} · Završeno: {1} · Aktivno: {2}</value></data>
+  <data name="ReportGenerated" xml:space="preserve"><value>Generisano: {0}</value></data>
+  <data name="ReportAttachments" xml:space="preserve"><value>Prilozi: {0}</value></data>
 </root>

@@ -10,6 +10,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
   public DbSet<TodoList> TodoLists { get; set; }
   public DbSet<TodoItem> TodoItems { get; set; }
   public DbSet<TodoListShare> TodoListShares { get; set; }
+  public DbSet<TodoAttachment> TodoAttachments { get; set; }
 
   protected override void OnModelCreating(ModelBuilder builder)
   {

@@ -81,7 +81,7 @@
         }
         else
         {
-            <div class="mb-3">
+            <div class="mb-3 d-flex flex-wrap align-items-center gap-2">
                 <RadzenSelectBar @bind-Value="filter" Size="ButtonSize.Small">
                     <Items>
                         <RadzenSelectBarItem Text="@L["FilterAll"]" Value="@ItemFilter.All" />
@@ -89,6 +89,8 @@
                         <RadzenSelectBarItem Text="@L["FilterCompleted"]" Value="@ItemFilter.Completed" />
                     </Items>
                 </RadzenSelectBar>
+                <a class="btn btn-sm btn-outline-secondary ms-auto" href="/api/lists/@ListId/export.pdf" download>@L["ExportPdf"]</a>
+                <a class="btn btn-sm btn-outline-secondary" href="/api/lists/@ListId/export.csv" download>@L["Export"]</a>
             </div>
 
             @if (!VisibleItems.Any())
@@ -147,6 +149,18 @@
                             </div>
                             <label class="form-label">@L["Description"]</label>
                             <RadzenTextArea @bind-Value="descriptionDraft" Placeholder="@L["AddDescriptionPlaceholder"]" Rows="3" Style="width:100%" />
+                            <label class="form-label mt-2">@L["Attachments"]</label>
+                            @foreach (var a in attachments)
+                            {
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <a href="/api/attachments/@a.Id" download="@a.FileName">@a.FileName</a>
+                                    <small class="text-muted">@FormatSize(a.Size)</small>
+                                    <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.ExtraSmall"
+                                                  Click="@(() => DeleteAttachment(a.Id))" />
+                                </div>
+                            }
+                            <InputFile class="form-control form-control-sm" style="max-width:400px" multiple
+                                       title="@L["AttachFile"]" OnChange="UploadAttachments" />
                             <div class="d-flex justify-content-end align-items-center gap-2 mt-2">
                                 @if (!string.IsNullOrEmpty(editError))
                                 {
@@ -160,6 +174,16 @@
                 </div>
             }
         }
+
+        @* Uvoz taskova *@
+        <div class="mt-3">
+            <label class="form-label mb-1">@L["Import"]</label>
+            <InputFile class="form-control form-control-sm" style="max-width:400px" accept=".csv" OnChange="ImportCsv" />
+            @if (!string.IsNullOrEmpty(importMessage))
+            {
+                <small class="@(importSucceeded ? "text-success" : "text-danger") mt-1 d-block">@importMessage</small>
+            }
+        </div>
 
         @* Deljenje liste *@
         @if (list.OwnerId == userId)
@@ -196,6 +220,10 @@
     private string shareEmail = string.Empty;
     private string shareMessage = string.Empty;
     private bool shareSucceeded;
+
+    private List<AttachmentInfo> attachments = [];
+    private string importMessage = string.Empty;
+    private bool importSucceeded;
 
     private Guid? draggedId;
     private Guid? dragOverId;
@@ -242,7 +270,59 @@
     private async Task LoadItems()
     {
         items = await TodoService.GetItemsAsync(ListId, userId);
+        attachments = expandedItemId is { } id
+            ? await TodoService.GetAttachmentsAsync(id, userId)
+            : [];
     }
+
+    private async Task UploadAttachments(InputFileChangeEventArgs e)
+    {
+        if (expandedItemId is not { } itemId) return;
+
+        editError = string.Empty;
+        foreach (var file in e.GetMultipleFiles(10))
+        {
+            try
+            {
+                await using var stream = file.OpenReadStream(ITodoService.MaxAttachmentBytes);
+                if (!await TodoService.AddAttachmentAsync(itemId, file.Name, file.ContentType, stream, userId))
+                    editError = L["AttachmentFailed", file.Name];
+            }
+            catch (IOException)
+            {
+                editError = L["AttachmentFailed", file.Name];
+            }
+        }
+        await LoadItems();
+    }
+
+    private async Task DeleteAttachment(Guid attachmentId)
+    {
+        await TodoService.DeleteAttachmentAsync(attachmentId, userId);
+        await LoadItems();
+    }
+
+    private async Task ImportCsv(InputFileChangeEventArgs e)
+    {
+        importMessage = string.Empty;
+        try
+        {
+            await using var stream = e.File.OpenReadStream(1024 * 1024);
+            using var reader = new StreamReader(stream);
+            var count = await TodoService.ImportCsvAsync(ListId, await reader.ReadToEndAsync(), userId);
+            importSucceeded = count is not null;
+            importMessage = count is { } n ? L["ImportSucceeded", n] : L["ImportFailed"];
+        }
+        catch (IOException)
+        {
+            importSucceeded = false;
+            importMessage = L["ImportFailed"];
+        }
+        await LoadItems();
+    }
+
+    private static string FormatSize(long bytes) =>
+        bytes < 1024 * 1024 ? $"{Math.Max(1, bytes / 1024)} KB" : $"{bytes / 1024.0 / 1024.0:0.#} MB";
 
     private async Task AddItem()
     {
@@ -280,7 +360,7 @@
         await LoadItems();
     }
 
-    private void ToggleExpand(TodoItem item)
+    private async Task ToggleExpand(TodoItem item)
     {
         if (expandedItemId == item.Id)
         {
@@ -289,6 +369,7 @@
         }
 
         expandedItemId = item.Id;
+        attachments = await TodoService.GetAttachmentsAsync(item.Id, userId);
         titleDraft = item.Title;
         priorityDraft = item.Priority;
         dueDateDraft = item.DueDate;
