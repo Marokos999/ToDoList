@@ -29,6 +29,9 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       # Npgsql tries GSS encryption by default and the runtime image has no libgssapi, which logs an error on every start
       ConnectionStrings__DefaultConnection: Host=db;Port=5432;Database=${POSTGRES_DB:-todoapp};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres};GSS Encryption Mode=Disable
+      Smtp__Host: ${SMTP_HOST:-smtp.gmail.com}
+      Smtp__Port: ${SMTP_PORT:-587}
+      Smtp__FromAddress: ${SMTP_FROM_ADDRESS:-}
       Smtp__UserName: ${SMTP_USERNAME:-}
       Smtp__Password: ${SMTP_PASSWORD:-}
       # Only for running locally without SMTP; never true on a public site
