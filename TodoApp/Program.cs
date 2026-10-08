@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,8 @@ using TodoApp.Data;
 using TodoApp.Application;
 using Microsoft.Extensions.Localization;
 using TodoApp.Resources;
+using Microsoft.AspNetCore.HttpOverrides;
+using System.Threading.RateLimiting;
 using Radzen;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
@@ -43,13 +46,34 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
     {
         options.SignIn.RequireConfirmedAccount = true;
         options.Stores.SchemaVersion = IdentitySchemaVersions.Version3;
+        options.Password.RequiredLength = 10;
+        options.Lockout.MaxFailedAccessAttempts = 5;
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
     })
     .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddErrorDescriber<LocalizedIdentityErrorDescriber>()
     .AddSignInManager()
     .AddDefaultTokenProviders();
 
+// Keys live in the database so auth cookies survive restarts and redeploys on hosts without persistent disks
+builder.Services.AddDataProtection().SetApplicationName("TodoApp").PersistKeysToDbContext<ApplicationDbContext>();
 builder.Services.AddSingleton<TodoNotifier>();
 builder.Services.AddSingleton<AppInfo>();
+builder.Services.AddHealthChecks().AddCheck<DatabaseHealthCheck>("database");
+
+// The platform's reverse proxy terminates TLS; trust its headers so the app sees the real scheme and client IP
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(AuthRateLimit.Partition);
+});
 builder.Services.AddRadzenComponents();
 var smtpSection = builder.Configuration.GetSection("Smtp");
 builder.Services.Configure<SmtpOptions>(smtpSection);
@@ -62,13 +86,20 @@ else
 var app = builder.Build();
 
 if (!smtpConfigured)
-    app.Logger.LogWarning("SMTP is not configured: emails are not sent and confirmation links are shown on the page.");
+{
+    if (app.Environment.IsDevelopment() || app.Services.GetRequiredService<AppInfo>().ShowConfirmationLink)
+        app.Logger.LogWarning("SMTP is not configured: emails are not sent and confirmation links are shown on the page.");
+    else
+        app.Logger.LogError("SMTP is not configured: new users cannot confirm their email and so cannot sign in. Set Smtp__Host, Smtp__UserName and Smtp__Password.");
+}
 
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     db.Database.Migrate();
 }
+
+app.UseForwardedHeaders();
 
 if (app.Environment.IsDevelopment())
     app.UseMigrationsEndPoint();
@@ -79,7 +110,8 @@ else
 }
 
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
-app.UseHttpsRedirection();
+// The platform health probe talks plain HTTP to the container, so it must not be redirected
+app.UseWhen(ctx => !ctx.Request.Path.StartsWithSegments("/health"), branch => branch.UseHttpsRedirection());
 string[] supportedCultures = ["sr-Latn-RS", "en-US"];
 var localizationOptions = new RequestLocalizationOptions()
     .SetDefaultCulture(supportedCultures[0])
@@ -88,11 +120,23 @@ var localizationOptions = new RequestLocalizationOptions()
 // Only the language dropdown's cookie counts; the browser language is ignored so Serbian stays the default
 localizationOptions.RequestCultureProviders = [new CookieRequestCultureProvider()];
 app.UseRequestLocalization(localizationOptions);
+app.Use(async (context, next) =>
+{
+    var headers = context.Response.Headers;
+    headers.XContentTypeOptions = "nosniff";
+    headers.XFrameOptions = "DENY";
+    headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+    headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()";
+    headers.ContentSecurityPolicy = "frame-ancestors 'none'";
+    await next();
+});
+app.UseRateLimiter();
 app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 app.MapAdditionalIdentityEndpoints();
+app.MapHealthChecks("/health");
 
 app.MapGet("/culture/set", (string culture, string? redirectUri, HttpContext http) =>
 {

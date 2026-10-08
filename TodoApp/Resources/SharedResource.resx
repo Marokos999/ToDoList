@@ -127,7 +127,7 @@
   <data name="Faq4Q" xml:space="preserve"><value>Kako da izvezem ili uvezem zadatke?</value></data>
   <data name="Faq4A" xml:space="preserve"><value>Na stranici liste izaberi izvoz u CSV ili PDF izveštaj. CSV fajl možeš kasnije da uvezeš u bilo koju svoju listu.</value></data>
   <data name="Faq5Q" xml:space="preserve"><value>Kako da obrišem nalog?</value></data>
-  <data name="Faq5A" xml:space="preserve"><value>Klikni na svoj email u meniju, izaberi stavku za lične podatke i obriši nalog. Za brisanje svih podataka, uključujući liste, piši nam na email iz Politike privatnosti.</value></data>
+  <data name="Faq5A" xml:space="preserve"><value>Klikni na svoj email u meniju, izaberi stavku za lične podatke i obriši nalog. Brišu se i sve tvoje liste, zadaci i prilozi.</value></data>
   <data name="Faq6Q" xml:space="preserve"><value>Da li su moji podaci bezbedni?</value></data>
   <data name="Faq6A" xml:space="preserve"><value>Lozinke se čuvaju kao heševi, a tvoje liste vide samo ti i osobe sa kojima ih podeliš. Više u Politici privatnosti.</value></data>
   <data name="NavPrivacy" xml:space="preserve"><value>Politika privatnosti</value></data>
@@ -135,4 +135,98 @@
   <data name="NavFaq" xml:space="preserve"><value>Česta pitanja</value></data>
   <data name="LogoAlt" xml:space="preserve"><value>Logo aplikacije {0}</value></data>
   <data name="NotFoundBack" xml:space="preserve"><value>Nazad na početnu</value></data>
+  <data name="RegisterConfirmTitle" xml:space="preserve"><value>Potvrda registracije</value></data>
+  <data name="RegisterConfirmCheckEmail" xml:space="preserve"><value>Proveri email da potvrdiš nalog. Ako poruka ne stigne, pogledaj i spam.</value></data>
+  <data name="RegisterConfirmNotConfigured" xml:space="preserve"><value>Slanje emailova trenutno nije podešeno, pa nalog ne može da se potvrdi. Obrati se administratoru.</value></data>
+  <data name="RegisterConfirmNoEmail" xml:space="preserve"><value>Slanje emailova nije podešeno (lokalni razvoj). Link bi inače stigao mejlom:</value></data>
+  <data name="RegisterConfirmClick" xml:space="preserve"><value>Klikni ovde da potvrdiš nalog</value></data>
+  <data name="RegisterConfirmUserNotFound" xml:space="preserve"><value>Korisnik sa tim emailom nije pronađen.</value></data>
+  <data name="IdEmail" xml:space="preserve"><value>Email</value></data>
+  <data name="IdPassword" xml:space="preserve"><value>Lozinka</value></data>
+  <data name="IdConfirmPassword" xml:space="preserve"><value>Potvrdi lozinku</value></data>
+  <data name="FieldEmail" xml:space="preserve"><value>Email</value></data>
+  <data name="FieldPassword" xml:space="preserve"><value>Lozinka</value></data>
+  <data name="FieldConfirmPassword" xml:space="preserve"><value>Potvrda lozinke</value></data>
+  <data name="ValRequired" xml:space="preserve"><value>Polje „{0}“ je obavezno.</value></data>
+  <data name="ValEmail" xml:space="preserve"><value>Polje „{0}“ nije ispravna email adresa.</value></data>
+  <data name="ValLength" xml:space="preserve"><value>Polje „{0}“ mora imati od {1} do {2} karaktera.</value></data>
+  <data name="ValCompare" xml:space="preserve"><value>Lozinka i potvrda lozinke se ne poklapaju.</value></data>
+  <data name="IdLogin" xml:space="preserve"><value>Prijava</value></data>
+  <data name="IdLoginLocal" xml:space="preserve"><value>Prijavi se svojim nalogom.</value></data>
+  <data name="IdRememberMe" xml:space="preserve"><value>Zapamti me</value></data>
+  <data name="IdOr" xml:space="preserve"><value>ILI</value></data>
+  <data name="IdLoginPasskey" xml:space="preserve"><value>Prijava pomoću passkey-a</value></data>
+  <data name="IdForgot" xml:space="preserve"><value>Zaboravljena lozinka?</value></data>
+  <data name="IdRegisterNew" xml:space="preserve"><value>Registruj se kao novi korisnik</value></data>
+  <data name="IdResendConfirm" xml:space="preserve"><value>Ponovo pošalji potvrdu emaila</value></data>
+  <data name="IdErrorPrefix" xml:space="preserve"><value>Greška: {0}</value></data>
+  <data name="IdInvalidLogin" xml:space="preserve"><value>Greška: pogrešan email ili lozinka.</value></data>
+  <data name="IdRegister" xml:space="preserve"><value>Registracija</value></data>
+  <data name="IdCreateAccount" xml:space="preserve"><value>Napravi novi nalog.</value></data>
+  <data name="IdEnterEmail" xml:space="preserve"><value>Unesi svoj email.</value></data>
+  <data name="IdResetPassword" xml:space="preserve"><value>Resetuj lozinku</value></data>
+  <data name="IdForgotConfirmTitle" xml:space="preserve"><value>Zahtev za reset lozinke</value></data>
+  <data name="IdCheckEmailReset" xml:space="preserve"><value>Proveri email da resetuješ lozinku.</value></data>
+  <data name="IdResetYour" xml:space="preserve"><value>Postavi novu lozinku.</value></data>
+  <data name="IdReset" xml:space="preserve"><value>Resetuj</value></data>
+  <data name="IdResetConfirmTitle" xml:space="preserve"><value>Lozinka je resetovana</value></data>
+  <data name="IdPasswordResetDone" xml:space="preserve"><value>Tvoja lozinka je resetovana.</value></data>
+  <data name="IdClickToLogin" xml:space="preserve"><value>Klikni ovde da se prijaviš</value></data>
+  <data name="IdResend" xml:space="preserve"><value>Pošalji ponovo</value></data>
+  <data name="IdVerificationSent" xml:space="preserve"><value>Ako nalog postoji, poruka za potvrdu je poslata. Proveri email.</value></data>
+  <data name="IdConfirmEmailTitle" xml:space="preserve"><value>Potvrda emaila</value></data>
+  <data name="IdUserLoadError" xml:space="preserve"><value>Greška pri učitavanju korisnika sa ID {0}</value></data>
+  <data name="IdEmailConfirmed" xml:space="preserve"><value>Hvala što si potvrdio email.</value></data>
+  <data name="IdEmailConfirmError" xml:space="preserve"><value>Greška pri potvrdi emaila.</value></data>
+  <data name="IdLockedOut" xml:space="preserve"><value>Nalog je zaključan</value></data>
+  <data name="IdLockedOutText" xml:space="preserve"><value>Nalog je privremeno zaključan, pokušaj ponovo kasnije.</value></data>
+  <data name="IdAccessDenied" xml:space="preserve"><value>Pristup odbijen</value></data>
+  <data name="IdAccessDeniedText" xml:space="preserve"><value>Nemaš pristup ovom resursu.</value></data>
+  <data name="IdInvalidUser" xml:space="preserve"><value>Nevažeći korisnik</value></data>
+  <data name="IdInvalidReset" xml:space="preserve"><value>Nevažeći reset lozinke</value></data>
+  <data name="IdInvalidResetText" xml:space="preserve"><value>Link za reset lozinke nije važeći.</value></data>
+  <data name="IdErrDefault" xml:space="preserve"><value>Došlo je do nepoznate greške.</value></data>
+  <data name="IdErrPasswordMismatch" xml:space="preserve"><value>Pogrešna lozinka.</value></data>
+  <data name="IdErrInvalidToken" xml:space="preserve"><value>Nevažeći ili istekao token.</value></data>
+  <data name="IdErrInvalidEmail" xml:space="preserve"><value>Email adresa nije ispravna.</value></data>
+  <data name="IdErrDuplicateEmail" xml:space="preserve"><value>Nalog sa ovom email adresom već postoji.</value></data>
+  <data name="IdErrPasswordTooShort" xml:space="preserve"><value>Lozinka mora imati najmanje {0} karaktera.</value></data>
+  <data name="IdErrPasswordNonAlphanumeric" xml:space="preserve"><value>Lozinka mora sadržati bar jedan specijalan karakter.</value></data>
+  <data name="IdErrPasswordDigit" xml:space="preserve"><value>Lozinka mora sadržati bar jednu cifru.</value></data>
+  <data name="IdErrPasswordLower" xml:space="preserve"><value>Lozinka mora sadržati bar jedno malo slovo.</value></data>
+  <data name="IdErrPasswordUpper" xml:space="preserve"><value>Lozinka mora sadržati bar jedno veliko slovo.</value></data>
+  <data name="IdErrPasswordUnique" xml:space="preserve"><value>Lozinka mora sadržati bar {0} različitih karaktera.</value></data>
+  <data name="FieldNewEmail" xml:space="preserve"><value>Novi email</value></data>
+  <data name="FieldOldPassword" xml:space="preserve"><value>Stara lozinka</value></data>
+  <data name="FieldNewPassword" xml:space="preserve"><value>Nova lozinka</value></data>
+  <data name="MgManageTitle" xml:space="preserve"><value>Podešavanje naloga</value></data>
+  <data name="MgChangeSettings" xml:space="preserve"><value>Izmeni podešavanja svog naloga</value></data>
+  <data name="MgProfile" xml:space="preserve"><value>Profil</value></data>
+  <data name="MgExternal" xml:space="preserve"><value>Spoljne prijave</value></data>
+  <data name="Mg2fa" xml:space="preserve"><value>Dvofaktorska autentifikacija</value></data>
+  <data name="MgPasskeys" xml:space="preserve"><value>Passkey-evi</value></data>
+  <data name="MgPersonalData" xml:space="preserve"><value>Lični podaci</value></data>
+  <data name="MgUsername" xml:space="preserve"><value>Korisničko ime</value></data>
+  <data name="MgPhone" xml:space="preserve"><value>Broj telefona</value></data>
+  <data name="MgPhoneFailed" xml:space="preserve"><value>Greška: broj telefona nije sačuvan.</value></data>
+  <data name="MgProfileUpdated" xml:space="preserve"><value>Profil je ažuriran</value></data>
+  <data name="MgManageEmail" xml:space="preserve"><value>Podešavanje emaila</value></data>
+  <data name="MgSendVerification" xml:space="preserve"><value>Pošalji potvrdu emaila</value></data>
+  <data name="MgNewEmail" xml:space="preserve"><value>Novi email</value></data>
+  <data name="MgChangeEmail" xml:space="preserve"><value>Promeni email</value></data>
+  <data name="MgEmailUnchanged" xml:space="preserve"><value>Email je nepromenjen.</value></data>
+  <data name="MgChangeLinkSent" xml:space="preserve"><value>Link za potvrdu promene emaila je poslat. Proveri email.</value></data>
+  <data name="MgVerificationSent" xml:space="preserve"><value>Poruka za potvrdu je poslata. Proveri email.</value></data>
+  <data name="MgChangePassword" xml:space="preserve"><value>Promena lozinke</value></data>
+  <data name="MgOldPassword" xml:space="preserve"><value>Stara lozinka</value></data>
+  <data name="MgNewPassword" xml:space="preserve"><value>Nova lozinka</value></data>
+  <data name="MgConfirmNewPassword" xml:space="preserve"><value>Potvrdi novu lozinku</value></data>
+  <data name="MgUpdatePassword" xml:space="preserve"><value>Promeni lozinku</value></data>
+  <data name="MgPasswordChanged" xml:space="preserve"><value>Lozinka je promenjena</value></data>
+  <data name="MgPersonalDataText" xml:space="preserve"><value>Tvoj nalog sadrži lične podatke koje si nam dao. Na ovoj stranici možeš da ih preuzmeš ili obrišeš.</value></data>
+  <data name="MgDeleteWarning" xml:space="preserve"><value>Brisanjem se trajno uklanja tvoj nalog, zajedno sa svim tvojim listama, zadacima i prilozima, i to ne može da se poništi.</value></data>
+  <data name="MgDownload" xml:space="preserve"><value>Preuzmi</value></data>
+  <data name="MgDeleteTitle" xml:space="preserve"><value>Brisanje ličnih podataka</value></data>
+  <data name="MgDeleteButton" xml:space="preserve"><value>Obriši podatke i zatvori nalog</value></data>
+  <data name="MgIncorrectPassword" xml:space="preserve"><value>Greška: pogrešna lozinka.</value></data>
 </root>

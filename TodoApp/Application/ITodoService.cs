@@ -30,5 +30,8 @@ public interface ITodoService
     /// <returns>Number of imported tasks, or null if the list is inaccessible or the file is not a valid export.</returns>
     Task<int?> ImportCsvAsync(Guid listId, string csv, string userId);
 
+    /// <summary>Permanently removes everything the user owns (including soft-deleted lists) and their access to shared lists.</summary>
+    Task DeleteUserDataAsync(string userId);
+
     Task<ShareResult> ShareListAsync(Guid listId, string ownerUserId, string targetEmail);
 }

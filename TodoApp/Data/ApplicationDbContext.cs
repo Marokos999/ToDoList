@@ -1,16 +1,18 @@
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using TodoApp.Domain;
 
 namespace TodoApp.Data;
 
-public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options), IDataProtectionKeyContext
 {
 
   public DbSet<TodoList> TodoLists { get; set; }
   public DbSet<TodoItem> TodoItems { get; set; }
   public DbSet<TodoListShare> TodoListShares { get; set; }
   public DbSet<TodoAttachment> TodoAttachments { get; set; }
+  public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
 
   protected override void OnModelCreating(ModelBuilder builder)
   {

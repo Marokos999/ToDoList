@@ -235,6 +235,16 @@ public class TodoService(IDbContextFactory<ApplicationDbContext> dbFactory, Todo
     return tasks.Count;
   }
 
+  public async Task DeleteUserDataAsync(string userId)
+  {
+    await using var db = await dbFactory.CreateDbContextAsync();
+    // Items, attachments and shares of the owned lists go with them through the cascading foreign keys
+    var listIds = await db.TodoLists.IgnoreQueryFilters().Where(l => l.OwnerId == userId).Select(l => l.Id).ToListAsync();
+    await db.TodoLists.IgnoreQueryFilters().Where(l => l.OwnerId == userId).ExecuteDeleteAsync();
+    await db.TodoListShares.Where(s => s.UserId == userId).ExecuteDeleteAsync();
+    foreach(var id in listIds) notifier.Notify(id);
+  }
+
   public async Task<ShareResult> ShareListAsync(Guid listId, string ownerUserId, string targetEmail)
   {
     await using var db = await dbFactory.CreateDbContextAsync();

@@ -1,10 +1,11 @@
 ﻿@inherits LayoutComponentBase
 @layout TodoApp.Components.Layout.MainLayout
+@inject IStringLocalizer<SharedResource> L
 
-<h1>Manage your account</h1>
+<h1>@L["MgManageTitle"]</h1>
 
 <div>
-    <h2>Change your account settings</h2>
+    <h2>@L["MgChangeSettings"]</h2>
     <hr />
     <div class="row">
         <div class="col-lg-3">

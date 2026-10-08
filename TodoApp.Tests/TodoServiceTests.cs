@@ -213,6 +213,31 @@ public sealed class TodoServiceTests(PostgresFixture fixture) : IClassFixture<Po
     }
 
     [Fact]
+    public async Task DeleteUserDataAsync_RemovesOwnedListsAndShares_ButKeepsOtherUsersData()
+    {
+        var leaving = await CreateUserAsync();
+        var other = await CreateUserAsync();
+        var owned = await service.CreateListAsync("Owned", leaving.Id);
+        var item = await service.AddItemAsync(owned.Id, "Task", Priority.Low, null, leaving.Id);
+        await service.AddAttachmentAsync(item!.Id, "a.txt", "text/plain", new MemoryStream([1]), leaving.Id);
+        await service.ShareListAsync(owned.Id, leaving.Id, other.Email!);
+        var deletedList = await service.CreateListAsync("Deleted", leaving.Id);
+        await service.DeleteListAsync(deletedList.Id, leaving.Id);
+
+        var othersList = await service.CreateListAsync("Others", other.Id);
+        await service.ShareListAsync(othersList.Id, other.Id, leaving.Email!);
+
+        await service.DeleteUserDataAsync(leaving.Id);
+
+        Assert.Null(await service.GetListAsync(owned.Id, other.Id));
+        Assert.Empty(await service.GetItemsAsync(owned.Id, other.Id));
+        Assert.NotNull(await service.GetListAsync(othersList.Id, other.Id));
+        Assert.Empty(await service.GetListsForUserAsync(leaving.Id));
+        // The share granting the departing user access to someone else's list is gone too
+        Assert.Null(await service.GetListAsync(othersList.Id, leaving.Id));
+    }
+
+    [Fact]
     public async Task ItemAndListChanges_NotifySubscribers()
     {
         var owner = await CreateUserAsync();

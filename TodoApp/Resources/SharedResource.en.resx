@@ -127,7 +127,7 @@
   <data name="Faq4Q" xml:space="preserve"><value>How do I export or import tasks?</value></data>
   <data name="Faq4A" xml:space="preserve"><value>On the list page choose the CSV export or the PDF report. A CSV file can later be imported into any of your lists.</value></data>
   <data name="Faq5Q" xml:space="preserve"><value>How do I delete my account?</value></data>
-  <data name="Faq5A" xml:space="preserve"><value>Click your email in the menu, open the personal data page and delete the account. To remove all your data, including lists, email us at the address in the Privacy Policy.</value></data>
+  <data name="Faq5A" xml:space="preserve"><value>Click your email in the menu, open the personal data page and delete the account. All your lists, tasks and attachments are deleted with it.</value></data>
   <data name="Faq6Q" xml:space="preserve"><value>Is my data safe?</value></data>
   <data name="Faq6A" xml:space="preserve"><value>Passwords are stored as hashes, and your lists are visible only to you and the people you share them with. More in the Privacy Policy.</value></data>
   <data name="NavPrivacy" xml:space="preserve"><value>Privacy Policy</value></data>
@@ -135,4 +135,98 @@
   <data name="NavFaq" xml:space="preserve"><value>FAQ</value></data>
   <data name="LogoAlt" xml:space="preserve"><value>{0} app logo</value></data>
   <data name="NotFoundBack" xml:space="preserve"><value>Back to home</value></data>
+  <data name="RegisterConfirmTitle" xml:space="preserve"><value>Register confirmation</value></data>
+  <data name="RegisterConfirmCheckEmail" xml:space="preserve"><value>Check your email to confirm your account. If it does not arrive, check your spam folder.</value></data>
+  <data name="RegisterConfirmNotConfigured" xml:space="preserve"><value>Email sending is not configured right now, so the account cannot be confirmed. Please contact the administrator.</value></data>
+  <data name="RegisterConfirmNoEmail" xml:space="preserve"><value>Email sending is not configured (local development). The link would normally be emailed:</value></data>
+  <data name="RegisterConfirmClick" xml:space="preserve"><value>Click here to confirm your account</value></data>
+  <data name="RegisterConfirmUserNotFound" xml:space="preserve"><value>No user was found for that email.</value></data>
+  <data name="IdEmail" xml:space="preserve"><value>Email</value></data>
+  <data name="IdPassword" xml:space="preserve"><value>Password</value></data>
+  <data name="IdConfirmPassword" xml:space="preserve"><value>Confirm password</value></data>
+  <data name="FieldEmail" xml:space="preserve"><value>Email</value></data>
+  <data name="FieldPassword" xml:space="preserve"><value>Password</value></data>
+  <data name="FieldConfirmPassword" xml:space="preserve"><value>Confirm password</value></data>
+  <data name="ValRequired" xml:space="preserve"><value>The “{0}” field is required.</value></data>
+  <data name="ValEmail" xml:space="preserve"><value>The “{0}” field is not a valid email address.</value></data>
+  <data name="ValLength" xml:space="preserve"><value>The “{0}” field must be between {1} and {2} characters long.</value></data>
+  <data name="ValCompare" xml:space="preserve"><value>The password and confirmation password do not match.</value></data>
+  <data name="IdLogin" xml:space="preserve"><value>Log in</value></data>
+  <data name="IdLoginLocal" xml:space="preserve"><value>Log in with your account.</value></data>
+  <data name="IdRememberMe" xml:space="preserve"><value>Remember me</value></data>
+  <data name="IdOr" xml:space="preserve"><value>OR</value></data>
+  <data name="IdLoginPasskey" xml:space="preserve"><value>Log in with a passkey</value></data>
+  <data name="IdForgot" xml:space="preserve"><value>Forgot your password?</value></data>
+  <data name="IdRegisterNew" xml:space="preserve"><value>Register as a new user</value></data>
+  <data name="IdResendConfirm" xml:space="preserve"><value>Resend email confirmation</value></data>
+  <data name="IdErrorPrefix" xml:space="preserve"><value>Error: {0}</value></data>
+  <data name="IdInvalidLogin" xml:space="preserve"><value>Error: Invalid email or password.</value></data>
+  <data name="IdRegister" xml:space="preserve"><value>Register</value></data>
+  <data name="IdCreateAccount" xml:space="preserve"><value>Create a new account.</value></data>
+  <data name="IdEnterEmail" xml:space="preserve"><value>Enter your email.</value></data>
+  <data name="IdResetPassword" xml:space="preserve"><value>Reset password</value></data>
+  <data name="IdForgotConfirmTitle" xml:space="preserve"><value>Password reset requested</value></data>
+  <data name="IdCheckEmailReset" xml:space="preserve"><value>Please check your email to reset your password.</value></data>
+  <data name="IdResetYour" xml:space="preserve"><value>Set a new password.</value></data>
+  <data name="IdReset" xml:space="preserve"><value>Reset</value></data>
+  <data name="IdResetConfirmTitle" xml:space="preserve"><value>Password reset</value></data>
+  <data name="IdPasswordResetDone" xml:space="preserve"><value>Your password has been reset.</value></data>
+  <data name="IdClickToLogin" xml:space="preserve"><value>Click here to log in</value></data>
+  <data name="IdResend" xml:space="preserve"><value>Resend</value></data>
+  <data name="IdVerificationSent" xml:space="preserve"><value>If the account exists, a confirmation email has been sent. Please check your email.</value></data>
+  <data name="IdConfirmEmailTitle" xml:space="preserve"><value>Confirm email</value></data>
+  <data name="IdUserLoadError" xml:space="preserve"><value>Error loading user with ID {0}</value></data>
+  <data name="IdEmailConfirmed" xml:space="preserve"><value>Thank you for confirming your email.</value></data>
+  <data name="IdEmailConfirmError" xml:space="preserve"><value>Error confirming your email.</value></data>
+  <data name="IdLockedOut" xml:space="preserve"><value>Account locked out</value></data>
+  <data name="IdLockedOutText" xml:space="preserve"><value>This account has been temporarily locked out, please try again later.</value></data>
+  <data name="IdAccessDenied" xml:space="preserve"><value>Access denied</value></data>
+  <data name="IdAccessDeniedText" xml:space="preserve"><value>You do not have access to this resource.</value></data>
+  <data name="IdInvalidUser" xml:space="preserve"><value>Invalid user</value></data>
+  <data name="IdInvalidReset" xml:space="preserve"><value>Invalid password reset</value></data>
+  <data name="IdInvalidResetText" xml:space="preserve"><value>The password reset link is invalid.</value></data>
+  <data name="IdErrDefault" xml:space="preserve"><value>An unknown failure has occurred.</value></data>
+  <data name="IdErrPasswordMismatch" xml:space="preserve"><value>Incorrect password.</value></data>
+  <data name="IdErrInvalidToken" xml:space="preserve"><value>Invalid or expired token.</value></data>
+  <data name="IdErrInvalidEmail" xml:space="preserve"><value>The email address is not valid.</value></data>
+  <data name="IdErrDuplicateEmail" xml:space="preserve"><value>An account with this email address already exists.</value></data>
+  <data name="IdErrPasswordTooShort" xml:space="preserve"><value>Passwords must be at least {0} characters.</value></data>
+  <data name="IdErrPasswordNonAlphanumeric" xml:space="preserve"><value>Passwords must have at least one non alphanumeric character.</value></data>
+  <data name="IdErrPasswordDigit" xml:space="preserve"><value>Passwords must have at least one digit.</value></data>
+  <data name="IdErrPasswordLower" xml:space="preserve"><value>Passwords must have at least one lowercase letter.</value></data>
+  <data name="IdErrPasswordUpper" xml:space="preserve"><value>Passwords must have at least one uppercase letter.</value></data>
+  <data name="IdErrPasswordUnique" xml:space="preserve"><value>Passwords must use at least {0} different characters.</value></data>
+  <data name="FieldNewEmail" xml:space="preserve"><value>New email</value></data>
+  <data name="FieldOldPassword" xml:space="preserve"><value>Current password</value></data>
+  <data name="FieldNewPassword" xml:space="preserve"><value>New password</value></data>
+  <data name="MgManageTitle" xml:space="preserve"><value>Manage your account</value></data>
+  <data name="MgChangeSettings" xml:space="preserve"><value>Change your account settings</value></data>
+  <data name="MgProfile" xml:space="preserve"><value>Profile</value></data>
+  <data name="MgExternal" xml:space="preserve"><value>External logins</value></data>
+  <data name="Mg2fa" xml:space="preserve"><value>Two-factor authentication</value></data>
+  <data name="MgPasskeys" xml:space="preserve"><value>Passkeys</value></data>
+  <data name="MgPersonalData" xml:space="preserve"><value>Personal data</value></data>
+  <data name="MgUsername" xml:space="preserve"><value>Username</value></data>
+  <data name="MgPhone" xml:space="preserve"><value>Phone number</value></data>
+  <data name="MgPhoneFailed" xml:space="preserve"><value>Error: Failed to set phone number.</value></data>
+  <data name="MgProfileUpdated" xml:space="preserve"><value>Your profile has been updated</value></data>
+  <data name="MgManageEmail" xml:space="preserve"><value>Manage email</value></data>
+  <data name="MgSendVerification" xml:space="preserve"><value>Send verification email</value></data>
+  <data name="MgNewEmail" xml:space="preserve"><value>New email</value></data>
+  <data name="MgChangeEmail" xml:space="preserve"><value>Change email</value></data>
+  <data name="MgEmailUnchanged" xml:space="preserve"><value>Your email is unchanged.</value></data>
+  <data name="MgChangeLinkSent" xml:space="preserve"><value>Confirmation link to change email sent. Please check your email.</value></data>
+  <data name="MgVerificationSent" xml:space="preserve"><value>Verification email sent. Please check your email.</value></data>
+  <data name="MgChangePassword" xml:space="preserve"><value>Change password</value></data>
+  <data name="MgOldPassword" xml:space="preserve"><value>Current password</value></data>
+  <data name="MgNewPassword" xml:space="preserve"><value>New password</value></data>
+  <data name="MgConfirmNewPassword" xml:space="preserve"><value>Confirm new password</value></data>
+  <data name="MgUpdatePassword" xml:space="preserve"><value>Update password</value></data>
+  <data name="MgPasswordChanged" xml:space="preserve"><value>Your password has been changed</value></data>
+  <data name="MgPersonalDataText" xml:space="preserve"><value>Your account contains personal data that you have given us. This page allows you to download or delete that data.</value></data>
+  <data name="MgDeleteWarning" xml:space="preserve"><value>Deleting permanently removes your account, together with all your lists, tasks and attachments, and this cannot be recovered.</value></data>
+  <data name="MgDownload" xml:space="preserve"><value>Download</value></data>
+  <data name="MgDeleteTitle" xml:space="preserve"><value>Delete personal data</value></data>
+  <data name="MgDeleteButton" xml:space="preserve"><value>Delete data and close my account</value></data>
+  <data name="MgIncorrectPassword" xml:space="preserve"><value>Error: Incorrect password.</value></data>
 </root>

@@ -7,8 +7,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     ports:
-      # 5433 on the host so it doesn't clash with a locally installed Postgres on 5432
-      - "5433:5432"
+      # Bound to localhost only (5433 so it does not clash with a local Postgres on 5432); never expose the database publicly
+      - "127.0.0.1:5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -31,11 +31,10 @@ services:
       ConnectionStrings__DefaultConnection: Host=db;Port=5432;Database=${POSTGRES_DB:-todoapp};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres};GSS Encryption Mode=Disable
       Smtp__UserName: ${SMTP_USERNAME:-}
       Smtp__Password: ${SMTP_PASSWORD:-}
+      # Only for running locally without SMTP; never true on a public site
+      Account__ShowConfirmationLink: ${ACCOUNT_SHOW_CONFIRMATION_LINK:-false}
     ports:
       - "${APP_PORT:-8081}:8080"
-    volumes:
-      - dpkeys:/home/app/.aspnet/DataProtection-Keys
 
 volumes:
   pgdata:
-  dpkeys:

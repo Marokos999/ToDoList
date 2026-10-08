@@ -51,11 +51,28 @@ public sealed class SeoTests
     }
 
     [Fact]
+    public void AppInfo_ShowsConfirmationLink_OnlyWhenExplicitlyEnabled()
+    {
+        Assert.False(new AppInfo(Config([])).ShowConfirmationLink);
+        Assert.True(new AppInfo(Config(new() { ["Account:ShowConfirmationLink"] = "true" })).ShowConfirmationLink);
+    }
+
+    [Fact]
     public void AppInfo_IgnoresAnalytics_ForUnknownProviderOrMissingId()
     {
         Assert.Null(new AppInfo(Config(new() { ["Analytics:Provider"] = "other", ["Analytics:SiteId"] = "abc" })).Analytics);
         Assert.Null(new AppInfo(Config(new() { ["Analytics:Provider"] = "plausible", ["Analytics:SiteId"] = " " })).Analytics);
     }
+
+    [Theory]
+    [InlineData("/Account/Login", "POST", true)]
+    [InlineData("/account/register", "POST", true)]
+    [InlineData("/Account/ForgotPassword", "POST", true)]
+    [InlineData("/Account/Login", "GET", false)]
+    [InlineData("/", "POST", false)]
+    [InlineData("/list/1", "POST", false)]
+    public void AuthRateLimit_LimitsOnlySensitiveFormSubmissions(string path, string method, bool expected) =>
+        Assert.Equal(expected, AuthRateLimit.IsSensitive(path, method));
 
     private static IConfiguration Config(Dictionary<string, string?> values) =>
         new ConfigurationBuilder().AddInMemoryCollection(values).Build();

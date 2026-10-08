@@ -1,4 +1,5 @@
 ﻿@page "/Account/Manage/PersonalData"
+@inject IStringLocalizer<SharedResource> L
 
 @using Microsoft.AspNetCore.Identity
 @using TodoApp.Data
@@ -6,23 +7,23 @@
 @inject UserManager<ApplicationUser> UserManager
 @inject IdentityRedirectManager RedirectManager
 
-<PageTitle>Personal Data</PageTitle>
+<PageTitle>@L["MgPersonalData"]</PageTitle>
 
 <StatusMessage />
-<h3>Personal Data</h3>
+<h3>@L["MgPersonalData"]</h3>
 
 <div class="row">
     <div class="col-md-6">
-        <p>Your account contains personal data that you have given us. This page allows you to download or delete that data.</p>
+        <p>@L["MgPersonalDataText"]</p>
         <p>
-            <strong>Deleting this data will permanently remove your account, and this cannot be recovered.</strong>
+            <strong>@L["MgDeleteWarning"]</strong>
         </p>
         <form action="Account/Manage/DownloadPersonalData" method="post">
             <AntiforgeryToken />
-            <button class="btn btn-primary" type="submit">Download</button>
+            <button class="btn btn-primary" type="submit">@L["MgDownload"]</button>
         </form>
         <p>
-            <a href="Account/Manage/DeletePersonalData" class="btn btn-danger">Delete</a>
+            <a href="Account/Manage/DeletePersonalData" class="btn btn-danger">@L["Delete"]</a>
         </p>
     </div>
 </div>

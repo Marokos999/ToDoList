@@ -1,4 +1,5 @@
 ﻿@page "/Account/Manage/DeletePersonalData"
+@inject IStringLocalizer<SharedResource> L
 
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Identity
@@ -8,16 +9,17 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject IdentityRedirectManager RedirectManager
 @inject ILogger<DeletePersonalData> Logger
+@inject ITodoService TodoService
 
-<PageTitle>Delete Personal Data</PageTitle>
+<PageTitle>@L["MgDeleteTitle"]</PageTitle>
 
 <StatusMessage Message="@message" />
 
-<h3>Delete Personal Data</h3>
+<h3>@L["MgDeleteTitle"]</h3>
 
 <div class="alert alert-warning" role="alert">
     <p>
-        <strong>Deleting this data will permanently remove your account, and this cannot be recovered.</strong>
+        <strong>@L["MgDeleteWarning"]</strong>
     </p>
 </div>
 
@@ -28,12 +30,12 @@
         @if (requirePassword)
         {
             <div class="form-floating mb-3">
-                <InputText type="password" @bind-Value="Input.Password" id="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="Please enter your password." />
-                <label for="Input.Password" class="form-label">Password</label>
+                <InputText type="password" @bind-Value="Input.Password" id="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="@L["IdPassword"]" />
+                <label for="Input.Password" class="form-label">@L["IdPassword"]</label>
                 <ValidationMessage For="() => Input.Password" class="text-danger" />
             </div>
         }
-        <button class="w-100 btn btn-lg btn-danger" type="submit">Delete data and close my account</button>
+        <button class="w-100 btn btn-lg btn-danger" type="submit">@L["MgDeleteButton"]</button>
     </EditForm>
 </div>
 
@@ -71,9 +73,12 @@
 
         if (requirePassword && !await UserManager.CheckPasswordAsync(user, Input.Password))
         {
-            message = "Error: Incorrect password.";
+            message = L["MgIncorrectPassword"];
             return;
         }
+
+        // Lists, tasks, attachments and shares are not linked to the user by a foreign key, so remove them explicitly
+        await TodoService.DeleteUserDataAsync(user.Id);
 
         var result = await UserManager.DeleteAsync(user);
         if (!result.Succeeded)

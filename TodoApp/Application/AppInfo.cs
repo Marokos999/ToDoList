@@ -10,6 +10,9 @@ public sealed class AppInfo(IConfiguration config)
   public string? ContactEmail => Value("Legal:ContactEmail");
   public bool LegalConfigured => OperatorName is not null && ContactEmail is not null;
 
+  /// <summary>Lets the registration page show the confirmation link when no email can be sent. Never enable this on a public site: anyone could confirm any address.</summary>
+  public bool ShowConfirmationLink => config.GetValue<bool>("Account:ShowConfirmationLink");
+
   public string? AnalyticsProvider => Value("Analytics:Provider");
   public string? AnalyticsSiteId => Value("Analytics:SiteId");
   public string? AnalyticsScriptUrl => Value("Analytics:ScriptUrl");
