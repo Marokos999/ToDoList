@@ -1,0 +1,72 @@
+@page "/terms"
+@using System.Globalization
+@inject IStringLocalizer<SharedResource> L
+@inject AppInfo Info
+
+<PageTitle>@Info.Name - @L["NavTerms"]</PageTitle>
+
+<div class="container py-4" style="max-width:48rem">
+    <h1 class="mb-1">@L["NavTerms"]</h1>
+    <p class="text-muted">@(Sr ? "Poslednja izmena" : "Last updated"): 2026-10-08</p>
+
+    @if (Sr)
+    {
+        <h2 class="h5 mt-4">1. Prihvatanje uslova</h2>
+        <p>Pravljenjem naloga ili korišćenjem aplikacije @Info.Name prihvataš ove uslove. Ako se ne slažeš sa njima, nemoj da koristiš aplikaciju. Operater je <strong>@OperatorName</strong>.</p>
+
+        <h2 class="h5 mt-4">2. Nalog</h2>
+        <p>Odgovoran si za tačnost email adrese, čuvanje lozinke i sve što se dešava preko tvog naloga. Obavesti nas ako posumnjaš na neovlašćen pristup.</p>
+
+        <h2 class="h5 mt-4">3. Tvoj sadržaj</h2>
+        <p>Sadržaj koji uneseš (liste, zadaci, prilozi) ostaje tvoj. Dozvoljavaš nam samo da ga čuvamo i prikazujemo tebi i osobama sa kojima ga podeliš, u meri potrebnoj za rad aplikacije. Odgovoran si da imaš pravo da postaviš ono što postavljaš.</p>
+
+        <h2 class="h5 mt-4">4. Dozvoljeno korišćenje</h2>
+        <p>Zabranjeno je postavljanje nezakonitog sadržaja i zlonamernih fajlova, ometanje rada aplikacije, pokušaji neovlašćenog pristupa tuđim podacima i automatizovano masovno slanje zahteva. Prilozi su ograničeni na 5 MB po fajlu.</p>
+
+        <h2 class="h5 mt-4">5. Dostupnost i garancije</h2>
+        <p>Aplikacija se pruža „takva kakva jeste", bez garancije neprekidnog rada ili odsustva grešaka. Preporučujemo da povremeno izvezeš važne liste (CSV ili PDF).</p>
+
+        <h2 class="h5 mt-4">6. Ograničenje odgovornosti</h2>
+        <p>U meri dozvoljenoj zakonom, ne odgovaramo za posrednu štetu ili gubitak podataka nastao korišćenjem aplikacije.</p>
+
+        <h2 class="h5 mt-4">7. Prestanak</h2>
+        <p>Nalog možeš da obrišeš u bilo kom trenutku. Možemo da ograničimo ili ugasimo nalog koji krši ove uslove.</p>
+
+        <h2 class="h5 mt-4">8. Izmene i kontakt</h2>
+        <p>Uslove možemo da izmenimo; datum poslednje izmene je na vrhu. Nastavak korišćenja posle izmene znači da ih prihvataš. Pitanja: @Contact. Merodavno je pravo Republike Srbije.</p>
+    }
+    else
+    {
+        <h2 class="h5 mt-4">1. Acceptance</h2>
+        <p>By creating an account or using @Info.Name you agree to these terms. If you do not agree, do not use the app. The operator is <strong>@OperatorName</strong>.</p>
+
+        <h2 class="h5 mt-4">2. Account</h2>
+        <p>You are responsible for the accuracy of your email address, keeping your password safe and everything that happens through your account. Tell us if you suspect unauthorized access.</p>
+
+        <h2 class="h5 mt-4">3. Your content</h2>
+        <p>The content you enter (lists, tasks, attachments) remains yours. You allow us only to store it and show it to you and the people you share it with, as needed to run the app. You are responsible for having the right to upload what you upload.</p>
+
+        <h2 class="h5 mt-4">4. Acceptable use</h2>
+        <p>Do not upload unlawful content or malicious files, disrupt the service, try to access other people's data without permission, or send automated bulk requests. Attachments are limited to 5 MB per file.</p>
+
+        <h2 class="h5 mt-4">5. Availability and warranty</h2>
+        <p>The app is provided "as is", without any guarantee of uninterrupted operation or freedom from errors. We recommend exporting important lists (CSV or PDF) from time to time.</p>
+
+        <h2 class="h5 mt-4">6. Limitation of liability</h2>
+        <p>To the extent permitted by law, we are not liable for indirect damages or data loss resulting from use of the app.</p>
+
+        <h2 class="h5 mt-4">7. Termination</h2>
+        <p>You can delete your account at any time. We may restrict or close an account that violates these terms.</p>
+
+        <h2 class="h5 mt-4">8. Changes and contact</h2>
+        <p>We may change these terms; the date of the last update is shown at the top. Continuing to use the app after a change means you accept it. Questions: @Contact. The law of the Republic of Serbia applies.</p>
+    }
+</div>
+
+@code {
+    private bool Sr => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "sr";
+    private string OperatorName => Info.OperatorName ?? "[IME OPERATERA / OPERATOR NAME]";
+    private MarkupString Contact => (MarkupString)(Info.ContactEmail is { } e
+        ? $"<a href=\"mailto:{System.Net.WebUtility.HtmlEncode(e)}\">{System.Net.WebUtility.HtmlEncode(e)}</a>"
+        : "[EMAIL]");
+}

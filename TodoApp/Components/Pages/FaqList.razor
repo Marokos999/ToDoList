@@ -1,0 +1,10 @@
+@inject IStringLocalizer<SharedResource> L
+
+@for (var i = 1; i <= 6; i++)
+{
+    var n = i;
+    <details class="border rounded px-3 py-2 mb-2">
+        <summary class="fw-semibold" style="cursor:pointer">@L[$"Faq{n}Q"]</summary>
+        <p class="mt-2 mb-1 text-muted">@L[$"Faq{n}A"]</p>
+    </details>
+}

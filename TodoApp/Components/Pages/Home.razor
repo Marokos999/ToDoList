@@ -1,0 +1,52 @@
+@page "/"
+@inject IStringLocalizer<SharedResource> L
+@inject AppInfo Info
+
+<AuthorizeView>
+    <Authorized>
+        <MyLists @rendermode="InteractiveServer" />
+    </Authorized>
+    <NotAuthorized>
+        <PageTitle>@Info.Name - @L["LandingTitle"]</PageTitle>
+
+        <section class="text-center py-5">
+            <h1 class="display-5 fw-bold">@L["LandingTitle"]</h1>
+            <p class="lead text-muted mx-auto" style="max-width:36rem">@L["LandingSubtitle"]</p>
+            <div class="d-flex flex-wrap justify-content-center align-items-center gap-3 mt-4">
+                <a class="btn btn-primary btn-lg" href="Account/Register">@L["CtaRegister"]</a>
+                <span class="text-muted">@L["LandingHaveAccount"] <a href="Account/Login">@L["CtaLogin"]</a></span>
+            </div>
+        </section>
+
+        <section class="row g-3 pb-5" aria-label="@Info.Name">
+            @foreach (var (title, text) in Features)
+            {
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h2 class="h5 card-title">@title</h2>
+                            <p class="card-text text-muted mb-0">@text</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </section>
+
+        <section class="pb-5" style="max-width:48rem">
+            <h2 class="h4 mb-3">@L["FaqTitle"]</h2>
+            <FaqList />
+            <div class="text-center mt-5">
+                <a class="btn btn-primary btn-lg" href="Account/Register">@L["CtaRegister"]</a>
+            </div>
+        </section>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private IEnumerable<(string Title, string Text)> Features =>
+    [
+        (L["Feature1Title"], L["Feature1Text"]),
+        (L["Feature2Title"], L["Feature2Text"]),
+        (L["Feature3Title"], L["Feature3Text"])
+    ];
+}

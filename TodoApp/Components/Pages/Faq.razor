@@ -1,0 +1,13 @@
+@page "/faq"
+@inject IStringLocalizer<SharedResource> L
+@inject AppInfo Info
+
+<PageTitle>@Info.Name - @L["FaqTitle"]</PageTitle>
+
+<div class="container py-4" style="max-width:48rem">
+    <h1 class="mb-4">@L["FaqTitle"]</h1>
+    <FaqList />
+    <div class="mt-4">
+        <a class="btn btn-primary" href="Account/Register">@L["CtaRegister"]</a>
+    </div>
+</div>

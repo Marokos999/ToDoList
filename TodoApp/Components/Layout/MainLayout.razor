@@ -1,5 +1,6 @@
 @inherits LayoutComponentBase
 @inject IStringLocalizer<SharedResource> L
+@inject AppInfo Info
 
 <div class="page">
     <div class="sidebar">
@@ -14,6 +15,13 @@
         <article class="content px-4">
             @Body
         </article>
+
+        <footer class="px-4 py-3 border-top small text-muted d-flex flex-wrap gap-3">
+            <span>&copy; @DateTime.UtcNow.Year @Info.Name</span>
+            <a href="faq">@L["NavFaq"]</a>
+            <a href="privacy">@L["NavPrivacy"]</a>
+            <a href="terms">@L["NavTerms"]</a>
+        </footer>
     </main>
 </div>
 

@@ -49,6 +49,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
     .AddDefaultTokenProviders();
 
 builder.Services.AddSingleton<TodoNotifier>();
+builder.Services.AddSingleton<AppInfo>();
 builder.Services.AddRadzenComponents();
 var smtpSection = builder.Configuration.GetSection("Smtp");
 builder.Services.Configure<SmtpOptions>(smtpSection);
@@ -134,6 +135,12 @@ app.MapGet("/api/lists/{id:guid}/export.pdf", async (Guid id, HttpContext http, 
     var counts = await todos.GetAttachmentCountsAsync(id, userId);
     return Results.File(TodoReport.Generate(list, items, counts, L), "application/pdf", "tasks.pdf");
 }).RequireAuthorization();
+
+app.MapGet("/robots.txt", (HttpContext http, AppInfo info) =>
+    Results.Text(SeoDocuments.Robots(info.PublicUrl ?? $"{http.Request.Scheme}://{http.Request.Host}"), "text/plain"));
+
+app.MapGet("/sitemap.xml", (HttpContext http, AppInfo info) =>
+    Results.Text(SeoDocuments.Sitemap(info.PublicUrl ?? $"{http.Request.Scheme}://{http.Request.Host}"), "application/xml"));
 
 static string UserId(HttpContext http) =>
     http.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? string.Empty;

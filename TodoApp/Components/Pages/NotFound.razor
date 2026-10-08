@@ -2,5 +2,14 @@
 @layout MainLayout
 @inject IStringLocalizer<SharedResource> L
 
-<h3>@L["NotFoundTitle"]</h3>
-<p>@L["NotFoundText"]</p>
+<PageTitle>404 - @L["NotFoundTitle"]</PageTitle>
+<HeadContent>
+    <meta name="robots" content="noindex" />
+</HeadContent>
+
+<div class="text-center py-5">
+    <p class="display-1 fw-bold text-muted mb-0">404</p>
+    <h1 class="h3">@L["NotFoundTitle"]</h1>
+    <p class="text-muted">@L["NotFoundText"]</p>
+    <a class="btn btn-primary mt-2" href="">@L["NotFoundBack"]</a>
+</div>

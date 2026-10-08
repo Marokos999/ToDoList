@@ -105,4 +105,34 @@
   <data name="ReportSummary" xml:space="preserve"><value>Ukupno: {0} · Završeno: {1} · Aktivno: {2}</value></data>
   <data name="ReportGenerated" xml:space="preserve"><value>Generisano: {0}</value></data>
   <data name="ReportAttachments" xml:space="preserve"><value>Prilozi: {0}</value></data>
+  <data name="MetaDescription" xml:space="preserve"><value>Jednostavna aplikacija za liste zadataka: prioriteti, rokovi, prilozi, deljenje sa drugima i izvoz u CSV i PDF.</value></data>
+  <data name="LandingTitle" xml:space="preserve"><value>Svi tvoji zadaci na jednom mestu</value></data>
+  <data name="LandingSubtitle" xml:space="preserve"><value>Pravi liste, postavljaj prioritete i rokove, deli ih sa drugima i prati šta je završeno.</value></data>
+  <data name="CtaRegister" xml:space="preserve"><value>Napravi nalog</value></data>
+  <data name="CtaLogin" xml:space="preserve"><value>Prijavi se</value></data>
+  <data name="LandingHaveAccount" xml:space="preserve"><value>Već imaš nalog?</value></data>
+  <data name="Feature1Title" xml:space="preserve"><value>Liste i prioriteti</value></data>
+  <data name="Feature1Text" xml:space="preserve"><value>Razvrstaj zadatke u liste, postavi prioritet i rok i prevuci ih na željeno mesto.</value></data>
+  <data name="Feature2Title" xml:space="preserve"><value>Deljenje sa drugima</value></data>
+  <data name="Feature2Text" xml:space="preserve"><value>Podeli listu preko emaila i radite zajedno na istim zadacima, uz izmene koje se odmah vide.</value></data>
+  <data name="Feature3Title" xml:space="preserve"><value>Prilozi i izvoz</value></data>
+  <data name="Feature3Text" xml:space="preserve"><value>Dodaj fajlove uz zadatke, a celu listu izvezi u CSV ili kao PDF izveštaj.</value></data>
+  <data name="FaqTitle" xml:space="preserve"><value>Česta pitanja</value></data>
+  <data name="Faq1Q" xml:space="preserve"><value>Koliko košta korišćenje?</value></data>
+  <data name="Faq1A" xml:space="preserve"><value>Trenutno je korišćenje besplatno.</value></data>
+  <data name="Faq2Q" xml:space="preserve"><value>Kako da podelim listu?</value></data>
+  <data name="Faq2A" xml:space="preserve"><value>Otvori listu i pri dnu stranice unesi email adresu osobe koja već ima nalog. Ona odmah vidi listu i može da menja zadatke.</value></data>
+  <data name="Faq3Q" xml:space="preserve"><value>Koje fajlove mogu da priložim?</value></data>
+  <data name="Faq3A" xml:space="preserve"><value>Bilo koji tip fajla do 5 MB po fajlu. Prilozi se dodaju u formi za izmenu zadatka.</value></data>
+  <data name="Faq4Q" xml:space="preserve"><value>Kako da izvezem ili uvezem zadatke?</value></data>
+  <data name="Faq4A" xml:space="preserve"><value>Na stranici liste izaberi izvoz u CSV ili PDF izveštaj. CSV fajl možeš kasnije da uvezeš u bilo koju svoju listu.</value></data>
+  <data name="Faq5Q" xml:space="preserve"><value>Kako da obrišem nalog?</value></data>
+  <data name="Faq5A" xml:space="preserve"><value>Klikni na svoj email u meniju, izaberi stavku za lične podatke i obriši nalog. Za brisanje svih podataka, uključujući liste, piši nam na email iz Politike privatnosti.</value></data>
+  <data name="Faq6Q" xml:space="preserve"><value>Da li su moji podaci bezbedni?</value></data>
+  <data name="Faq6A" xml:space="preserve"><value>Lozinke se čuvaju kao heševi, a tvoje liste vide samo ti i osobe sa kojima ih podeliš. Više u Politici privatnosti.</value></data>
+  <data name="NavPrivacy" xml:space="preserve"><value>Politika privatnosti</value></data>
+  <data name="NavTerms" xml:space="preserve"><value>Uslovi korišćenja</value></data>
+  <data name="NavFaq" xml:space="preserve"><value>Česta pitanja</value></data>
+  <data name="LogoAlt" xml:space="preserve"><value>Logo aplikacije {0}</value></data>
+  <data name="NotFoundBack" xml:space="preserve"><value>Nazad na početnu</value></data>
 </root>

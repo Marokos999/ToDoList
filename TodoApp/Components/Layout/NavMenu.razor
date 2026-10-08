@@ -2,10 +2,14 @@
 
 @inject NavigationManager NavigationManager
 @inject IStringLocalizer<SharedResource> L
+@inject AppInfo Info
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">TodoApp</a>
+        <a class="navbar-brand d-flex align-items-center gap-2" href="">
+            <img src="favicon.svg" width="28" height="28" alt="@L["LogoAlt", Info.Name]" />
+            @Info.Name
+        </a>
     </div>
 </div>
 

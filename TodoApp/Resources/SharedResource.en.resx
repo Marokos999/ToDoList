@@ -105,4 +105,34 @@
   <data name="ReportSummary" xml:space="preserve"><value>Total: {0} · Completed: {1} · Active: {2}</value></data>
   <data name="ReportGenerated" xml:space="preserve"><value>Generated: {0}</value></data>
   <data name="ReportAttachments" xml:space="preserve"><value>Attachments: {0}</value></data>
+  <data name="MetaDescription" xml:space="preserve"><value>A simple to-do list app: priorities, due dates, attachments, sharing with others and export to CSV and PDF.</value></data>
+  <data name="LandingTitle" xml:space="preserve"><value>All your tasks in one place</value></data>
+  <data name="LandingSubtitle" xml:space="preserve"><value>Create lists, set priorities and due dates, share them with others and track what is done.</value></data>
+  <data name="CtaRegister" xml:space="preserve"><value>Create an account</value></data>
+  <data name="CtaLogin" xml:space="preserve"><value>Log in</value></data>
+  <data name="LandingHaveAccount" xml:space="preserve"><value>Already have an account?</value></data>
+  <data name="Feature1Title" xml:space="preserve"><value>Lists and priorities</value></data>
+  <data name="Feature1Text" xml:space="preserve"><value>Organize tasks into lists, set a priority and a due date, and drag them where you want them.</value></data>
+  <data name="Feature2Title" xml:space="preserve"><value>Share with others</value></data>
+  <data name="Feature2Text" xml:space="preserve"><value>Share a list by email and work on the same tasks together, with changes showing up instantly.</value></data>
+  <data name="Feature3Title" xml:space="preserve"><value>Attachments and export</value></data>
+  <data name="Feature3Text" xml:space="preserve"><value>Attach files to tasks and export a whole list to CSV or as a PDF report.</value></data>
+  <data name="FaqTitle" xml:space="preserve"><value>Frequently asked questions</value></data>
+  <data name="Faq1Q" xml:space="preserve"><value>How much does it cost?</value></data>
+  <data name="Faq1A" xml:space="preserve"><value>Right now it is free to use.</value></data>
+  <data name="Faq2Q" xml:space="preserve"><value>How do I share a list?</value></data>
+  <data name="Faq2A" xml:space="preserve"><value>Open the list and enter the email of a person who already has an account at the bottom of the page. They see the list immediately and can edit its tasks.</value></data>
+  <data name="Faq3Q" xml:space="preserve"><value>Which files can I attach?</value></data>
+  <data name="Faq3A" xml:space="preserve"><value>Any file type up to 5 MB per file. Attachments are added in the task edit form.</value></data>
+  <data name="Faq4Q" xml:space="preserve"><value>How do I export or import tasks?</value></data>
+  <data name="Faq4A" xml:space="preserve"><value>On the list page choose the CSV export or the PDF report. A CSV file can later be imported into any of your lists.</value></data>
+  <data name="Faq5Q" xml:space="preserve"><value>How do I delete my account?</value></data>
+  <data name="Faq5A" xml:space="preserve"><value>Click your email in the menu, open the personal data page and delete the account. To remove all your data, including lists, email us at the address in the Privacy Policy.</value></data>
+  <data name="Faq6Q" xml:space="preserve"><value>Is my data safe?</value></data>
+  <data name="Faq6A" xml:space="preserve"><value>Passwords are stored as hashes, and your lists are visible only to you and the people you share them with. More in the Privacy Policy.</value></data>
+  <data name="NavPrivacy" xml:space="preserve"><value>Privacy Policy</value></data>
+  <data name="NavTerms" xml:space="preserve"><value>Terms of Service</value></data>
+  <data name="NavFaq" xml:space="preserve"><value>FAQ</value></data>
+  <data name="LogoAlt" xml:space="preserve"><value>{0} app logo</value></data>
+  <data name="NotFoundBack" xml:space="preserve"><value>Back to home</value></data>
 </root>

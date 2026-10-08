@@ -1,0 +1,98 @@
+@page "/privacy"
+@using System.Globalization
+@inject IStringLocalizer<SharedResource> L
+@inject AppInfo Info
+
+<PageTitle>@Info.Name - @L["NavPrivacy"]</PageTitle>
+
+<div class="container py-4" style="max-width:48rem">
+    <h1 class="mb-1">@L["NavPrivacy"]</h1>
+    <p class="text-muted">@(Sr ? "Poslednja izmena" : "Last updated"): 2026-10-08</p>
+
+    @if (Sr)
+    {
+        <h2 class="h5 mt-4">1. Ko obrađuje podatke</h2>
+        <p>Podatke obrađuje <strong>@OperatorName</strong> (u daljem tekstu „mi"), operater aplikacije @Info.Name. Kontakt: @Contact.</p>
+
+        <h2 class="h5 mt-4">2. Koje podatke prikupljamo</h2>
+        <ul>
+            <li><strong>Podaci o nalogu:</strong> email adresa i lozinka (čuva se samo u obliku heša, nikad kao običan tekst).</li>
+            <li><strong>Sadržaj koji unosiš:</strong> nazive lista, zadatke, opise, rokove, prioritete i fajlove koje priložiš.</li>
+            <li><strong>Deljenje:</strong> informacija sa kojim je nalozima lista podeljena.</li>
+            <li><strong>Tehnički podaci:</strong> serverski logovi (npr. IP adresa, vreme zahteva i greške) potrebni za rad i bezbednost.</li>
+        </ul>
+
+        <h2 class="h5 mt-4">3. Zašto ih koristimo</h2>
+        <p>Da bismo ti omogućili nalog i rad sa listama, poslali emailove za potvrdu naloga i reset lozinke, zaštitili aplikaciju od zloupotrebe i otklanjali greške. Podatke ne prodajemo i ne koristimo za reklame.</p>
+
+        <h2 class="h5 mt-4">4. Kolačići</h2>
+        <ul>
+            <li><strong>Prijava</strong> (neophodan): održava te prijavljenim.</li>
+            <li><strong>Zaštita formulara</strong> (neophodan): sprečava lažne zahteve.</li>
+            <li><strong>Jezik</strong>: pamti izabrani jezik.</li>
+        </ul>
+        @if (Info.Analytics is { } a)
+        {
+            <p>Za statistiku poseta koristimo <strong>@a.ProviderName</strong>. Prikuplja anonimne podatke o posetama (npr. stranice, vrsta uređaja, zemlja) bez praćenja između sajtova i bez ličnih profila.</p>
+        }
+
+        <h2 class="h5 mt-4">5. Ko još ima pristup</h2>
+        <p>Podatke obrađuju pružaoci usluga koji nam omogućavaju rad: hosting, baza podataka i slanje emailova. Sa njima delimo samo ono što je neophodno. Liste vide samo ti i nalozi sa kojima ih podeliš.</p>
+
+        <h2 class="h5 mt-4">6. Koliko dugo čuvamo podatke</h2>
+        <p>Dok postoji tvoj nalog. Nalog možeš da obrišeš u podešavanjima naloga. Za brisanje svih podataka, uključujući liste i priloge, piši nam na @Contact.</p>
+
+        <h2 class="h5 mt-4">7. Tvoja prava</h2>
+        <p>Imaš pravo da zatražiš pristup podacima, ispravku, brisanje, ograničenje obrade i prenosivost (izvoz liste u CSV ili PDF možeš da uradiš sam). Zahtev pošalji na @Contact. Imaš i pravo da podneseš pritužbu nadležnom organu za zaštitu podataka o ličnosti (u Srbiji: Poverenik za informacije od javnog značaja i zaštitu podataka o ličnosti).</p>
+
+        <h2 class="h5 mt-4">8. Izmene</h2>
+        <p>Ovu politiku možemo da izmenimo. Datum poslednje izmene je naveden na vrhu stranice.</p>
+    }
+    else
+    {
+        <h2 class="h5 mt-4">1. Who processes your data</h2>
+        <p>Your data is processed by <strong>@OperatorName</strong> ("we"), the operator of the @Info.Name app. Contact: @Contact.</p>
+
+        <h2 class="h5 mt-4">2. What we collect</h2>
+        <ul>
+            <li><strong>Account data:</strong> your email address and password (stored only as a hash, never as plain text).</li>
+            <li><strong>Content you enter:</strong> list names, tasks, descriptions, due dates, priorities and files you attach.</li>
+            <li><strong>Sharing:</strong> which accounts a list is shared with.</li>
+            <li><strong>Technical data:</strong> server logs (such as IP address, request time and errors) needed to run and secure the service.</li>
+        </ul>
+
+        <h2 class="h5 mt-4">3. Why we use it</h2>
+        <p>To provide your account and lists, send account confirmation and password reset emails, protect the service from abuse and fix errors. We do not sell your data and do not use it for advertising.</p>
+
+        <h2 class="h5 mt-4">4. Cookies</h2>
+        <ul>
+            <li><strong>Sign-in</strong> (essential): keeps you signed in.</li>
+            <li><strong>Form protection</strong> (essential): prevents forged requests.</li>
+            <li><strong>Language</strong>: remembers your chosen language.</li>
+        </ul>
+        @if (Info.Analytics is { } a)
+        {
+            <p>We use <strong>@a.ProviderName</strong> for visit statistics. It collects anonymous data about visits (such as pages, device type and country) without cross-site tracking and without personal profiles.</p>
+        }
+
+        <h2 class="h5 mt-4">5. Who else has access</h2>
+        <p>Service providers that let us run the service process data on our behalf: hosting, database and email delivery. We share only what is necessary. Your lists are visible only to you and the accounts you share them with.</p>
+
+        <h2 class="h5 mt-4">6. How long we keep data</h2>
+        <p>For as long as your account exists. You can delete your account in the account settings. To remove all your data, including lists and attachments, email us at @Contact.</p>
+
+        <h2 class="h5 mt-4">7. Your rights</h2>
+        <p>You can request access, correction, deletion, restriction of processing and portability (you can export a list to CSV or PDF yourself). Send requests to @Contact. You also have the right to lodge a complaint with your data protection authority.</p>
+
+        <h2 class="h5 mt-4">8. Changes</h2>
+        <p>We may update this policy. The date of the last update is shown at the top of the page.</p>
+    }
+</div>
+
+@code {
+    private bool Sr => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "sr";
+    private string OperatorName => Info.OperatorName ?? "[IME OPERATERA / OPERATOR NAME]";
+    private MarkupString Contact => (MarkupString)(Info.ContactEmail is { } e
+        ? $"<a href=\"mailto:{System.Net.WebUtility.HtmlEncode(e)}\">{System.Net.WebUtility.HtmlEncode(e)}</a>"
+        : "[EMAIL]");
+}

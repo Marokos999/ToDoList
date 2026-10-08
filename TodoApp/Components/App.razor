@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+@inject IStringLocalizer<SharedResource> L
+@inject AppInfo Info
+<!DOCTYPE html>
 <html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
 
 <head>
@@ -11,8 +13,12 @@
     <link rel="stylesheet" href="@Assets["TodoApp.styles.css"]" />
     <link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css" />
     <ImportMap />
-    <link rel="icon" type="image/png" href="favicon.png" />
     <HeadOutlet />
+    <meta name="description" content="@L["MetaDescription"]" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <meta name="theme-color" content="#4338ca" />
 </head>
 
 <body>
@@ -21,7 +27,14 @@
     <ReconnectModal />
     <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
     <script src="@Assets["_framework/blazor.web.js"]"></script>
+    @if (Info.Analytics is { } analytics)
+    {
+        <script defer src="@analytics.Src" @attributes="AnalyticsAttributes(analytics)"></script>
+    }
     <script src="@Assets["Components/Account/Shared/PasskeySubmit.razor.js"]" type="module"></script>
 </body>
 
 </html>
+@code {
+    private static Dictionary<string, object> AnalyticsAttributes(AnalyticsScript a) => new() { [a.IdAttribute] = a.Id };
+}
