@@ -98,7 +98,13 @@
 
             @foreach (var item in VisibleItems)
             {
-                <div class="card mb-2 shadow-sm @(item.IsCompleted ? "opacity-50" : "")">
+                <div class="card mb-2 shadow-sm @(item.IsCompleted ? "opacity-50" : "") @(dragOverId == item.Id && draggedId != item.Id ? "border-primary" : "")"
+                     draggable="true"
+                     @ondragstart="() => draggedId = item.Id"
+                     @ondragend="EndDrag"
+                     @ondragover="() => dragOverId = item.Id"
+                     @ondragover:preventDefault
+                     @ondrop="() => DropOn(item.Id)">
                     <div class="card-body py-2 d-flex align-items-center gap-3">
                         <RadzenCheckBox Value="@item.IsCompleted"
                                         TValue="bool"
@@ -190,6 +196,9 @@
     private string shareEmail = string.Empty;
     private string shareMessage = string.Empty;
     private bool shareSucceeded;
+
+    private Guid? draggedId;
+    private Guid? dragOverId;
 
     private Guid? expandedItemId;
     private string titleDraft = string.Empty;
@@ -298,6 +307,22 @@
         await TodoService.UpdateItemAsync(itemId, titleDraft, priorityDraft, dueDateDraft, descriptionDraft, userId);
         await LoadItems();
         expandedItemId = null;
+    }
+
+    private void EndDrag()
+    {
+        draggedId = null;
+        dragOverId = null;
+    }
+
+    private async Task DropOn(Guid targetId)
+    {
+        var dragged = draggedId;
+        EndDrag();
+        if (dragged is null || dragged == targetId) return;
+
+        await TodoService.MoveItemAsync(dragged.Value, targetId, userId);
+        await LoadItems();
     }
 
     private void StartRename()

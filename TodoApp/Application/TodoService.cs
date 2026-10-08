@@ -105,6 +105,30 @@ public class TodoService(IDbContextFactory<ApplicationDbContext> dbFactory, Todo
     notifier.Notify(listId);
   }
 
+  public async Task MoveItemAsync(Guid itemId, Guid targetItemId, string userId)
+  {
+    if(itemId == targetItemId) return;
+
+    await using var db = await dbFactory.CreateDbContextAsync();
+    var moved = await AccessibleItems(db, userId).FirstOrDefaultAsync(i => i.Id == itemId);
+    if(moved is null) return;
+
+    var items = await db.TodoItems
+                       .Where(i => i.ListId == moved.ListId)
+                       .OrderBy(i => i.Order)
+                       .ToListAsync();
+    var targetIndex = items.FindIndex(i => i.Id == targetItemId);
+    if(targetIndex < 0) return;
+
+    items.Remove(moved);
+    items.Insert(targetIndex, moved);
+    for(var i = 0; i < items.Count; i++)
+      items[i].Order = i + 1;
+
+    await db.SaveChangesAsync();
+    notifier.Notify(moved.ListId);
+  }
+
   public async Task<ShareResult> ShareListAsync(Guid listId, string ownerUserId, string targetEmail)
   {
     await using var db = await dbFactory.CreateDbContextAsync();

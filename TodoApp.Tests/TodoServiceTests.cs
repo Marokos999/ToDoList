@@ -142,6 +142,26 @@ public sealed class TodoServiceTests(PostgresFixture fixture) : IClassFixture<Po
     }
 
     [Fact]
+    public async Task MoveItemAsync_MovesItemToTargetPosition_AndStrangerCannotMove()
+    {
+        var owner = await CreateUserAsync();
+        var stranger = await CreateUserAsync();
+        var list = await service.CreateListAsync("List", owner.Id);
+        var a = await service.AddItemAsync(list.Id, "A", Priority.Low, null, owner.Id);
+        var b = await service.AddItemAsync(list.Id, "B", Priority.Low, null, owner.Id);
+        var c = await service.AddItemAsync(list.Id, "C", Priority.Low, null, owner.Id);
+
+        await service.MoveItemAsync(c!.Id, a!.Id, stranger.Id);
+        Assert.Equal(["A", "B", "C"], (await service.GetItemsAsync(list.Id, owner.Id)).Select(i => i.Title));
+
+        await service.MoveItemAsync(c.Id, a.Id, owner.Id);
+        Assert.Equal(["C", "A", "B"], (await service.GetItemsAsync(list.Id, owner.Id)).Select(i => i.Title));
+
+        await service.MoveItemAsync(c.Id, b!.Id, owner.Id);
+        Assert.Equal(["A", "B", "C"], (await service.GetItemsAsync(list.Id, owner.Id)).Select(i => i.Title));
+    }
+
+    [Fact]
     public async Task ItemAndListChanges_NotifySubscribers()
     {
         var owner = await CreateUserAsync();
