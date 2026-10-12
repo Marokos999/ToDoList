@@ -2,8 +2,8 @@
 
 Real-time shared to-do lists built with **Blazor Server** on **.NET 10**. Create lists, share them with other users by email, and every change shows up instantly in all open tabs, without a refresh.
 
-**Live demo:** https://todoapp-marokos-d6hbh6h2hjgmhaby.westeurope-01.azurewebsites.net
-<sub>Hosted on Azure App Service (Free tier), so the first request after a while can take a few seconds.</sub>
+**Live demo:** https://todo.cloudandbear.com
+<sub>Hosted on a Hetzner Cloud VPS behind Caddy (automatic HTTPS) and deployed by GitHub Actions after the tests pass.</sub>
 
 ![Real-time sync between two browser tabs](docs/realtime-sync.gif)
 
@@ -27,9 +27,9 @@ Real-time shared to-do lists built with **Blazor Server** on **.NET 10**. Create
 | --- | --- |
 | UI | Blazor Server (Interactive Server render mode over SignalR), Radzen.Blazor |
 | Backend | ASP.NET Core 10, ASP.NET Core Identity |
-| Data | EF Core 10 + Npgsql, PostgreSQL (17 in Docker, Neon in production) |
-| Email | MailKit (SMTP) |
-| DevOps | Docker Compose, GitHub Actions, Azure App Service |
+| Data | EF Core 10 + Npgsql, PostgreSQL 17 (Docker Compose; Neon also supported) |
+| Email | MailKit (SMTP), Brevo in production |
+| DevOps | Docker Compose, GitHub Actions (tests, SSH deploy), Caddy, Hetzner Cloud |
 
 ## Architecture
 
@@ -115,11 +115,31 @@ The tests start a PostgreSQL 17 container with Testcontainers (Docker must be ru
 | `Legal__OperatorName`, `Legal__ContactEmail` | Operator details shown on the privacy policy and terms pages. Fill these in before going public |
 | `Analytics__Provider`, `Analytics__SiteId`, `Analytics__ScriptUrl` | Optional cookieless analytics: `Plausible` (site id is the domain) or `Umami` (website id). `ScriptUrl` is only needed for self-hosting |
 
-## Deployment (Render + Neon)
+## Deployment
 
-The app runs on [Render](https://render.com) as a Docker web service, and the database is a [Neon](https://neon.tech) PostgreSQL project. Render builds the `Dockerfile` on every push to `main`; the tests run in GitHub Actions ([`.github/workflows/test.yml`](.github/workflows/test.yml)).
+The live demo runs on a Hetzner VPS. The app can also run on Render with a Neon database, which is described further down.
 
-### First deploy
+### Hetzner VPS (the live demo)
+
+A shared [Caddy](https://caddyserver.com) reverse proxy terminates HTTPS (certificates are issued and renewed automatically) and forwards to the app container. PostgreSQL runs in the same Docker Compose stack and is not reachable from outside.
+
+Every push to `main` runs the tests ([`test.yml`](.github/workflows/test.yml)). When they pass, [`deploy.yml`](.github/workflows/deploy.yml) connects to the server over SSH, checks out the tested commit, runs `docker compose up -d --build` and waits until `/health` answers. It needs the repository secrets `DEPLOY_HOST`, `DEPLOY_SSH_KEY` and `DEPLOY_KNOWN_HOSTS` (the pinned host key). The application's own settings live in a `.env` file on the server and never in Git.
+
+[`docker-compose.prod.yml`](docker-compose.prod.yml) joins an external Docker network called `edge` as `todo-app:8080`, publishes no host ports, and keeps PostgreSQL inside the compose network. The proxy needs a site pointing at `todo-app:8080` and must pass WebSockets through (the Blazor circuit); behind it the app trusts the `X-Forwarded-*` headers. To set up a new server:
+
+```bash
+docker network create edge 2>/dev/null   # once per server, skip if the proxy already created it
+cp .env.example .env                     # set POSTGRES_PASSWORD, SMTP_*, APP_PUBLIC_URL and LEGAL_*
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+Accounts can only be confirmed through the emailed link, so SMTP must be configured. After the first start, updates are done by the pipeline.
+
+### Render + Neon (alternative)
+
+The app can also run on [Render](https://render.com) as a Docker web service, with a [Neon](https://neon.tech) PostgreSQL project as the database. Render builds the `Dockerfile` on every push to `main`.
+
+### First deploy on Render
 
 1. **Neon:** create a project, copy the connection details and build the string
    `Host=<host>;Port=5432;Database=<db>;Username=<user>;Password=<password>;SSL Mode=Require;GSS Encryption Mode=Disable`.
@@ -144,7 +164,7 @@ Render's free plan puts the service to sleep after about 15 minutes without traf
 3. Create a list and a task, drag a task, add an attachment and download it, export CSV and PDF.
 4. Check a phone-sized screen, then log out and make sure `/list/...` redirects to the login page.
 
-### Backups and restore
+### Backups and restore (Neon)
 
 Neon keeps point-in-time history (enable and size it in the project settings). For an extra copy on your machine:
 
@@ -156,23 +176,11 @@ Dumps go to `backups/`, which is git-ignored because it contains user data and p
 
 ### Security notes
 
-- The app trusts the proxy's `X-Forwarded-*` headers (needed behind Render), so only run it behind a trusted proxy.
+- The app trusts the proxy's `X-Forwarded-*` headers (needed behind a reverse proxy such as Caddy or Render), so only run it behind a trusted proxy.
 - Login, registration and password-reset form posts are limited to 10 per minute per IP; accounts lock for 15 minutes after 5 failed sign-ins; passwords need at least 10 characters.
 - Data protection keys are stored in the database, so users stay signed in across deploys.
 - Deleting an account deletes its lists, tasks, attachments and shares.
 
-### Custom domain
+### Custom domain on Render
 
 Add the domain in Render → Settings → Custom Domains and create the DNS records Render shows; HTTPS is issued automatically. Then set `App__PublicUrl` to the new address, send email from an address on that domain, and add SPF/DKIM records with your email provider.
-
-### Self-hosting on a VPS
-
-[`docker-compose.prod.yml`](docker-compose.prod.yml) is meant for a server where a reverse proxy already handles HTTPS for several apps. The app joins an external Docker network called `edge` as `todo-app:8080`, no host ports are published, and PostgreSQL is only reachable inside the compose network. The proxy needs a site pointing at `todo-app:8080` and must pass WebSockets through (the Blazor circuit); behind it the app trusts the `X-Forwarded-*` headers.
-
-```bash
-docker network create edge 2>/dev/null   # once per server, skip if the proxy already created it
-cp .env.example .env                     # set POSTGRES_PASSWORD, SMTP_*, APP_PUBLIC_URL and LEGAL_*
-docker compose -f docker-compose.prod.yml up -d --build
-```
-
-Accounts can only be confirmed through the emailed link, so SMTP must be configured. To update: `git pull` and run the last command again.
