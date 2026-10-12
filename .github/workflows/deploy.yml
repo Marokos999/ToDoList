@@ -1,0 +1,59 @@
+name: Deploy
+
+# Runs after the Test workflow succeeded on main and updates the Hetzner server over SSH.
+# Needs the secrets DEPLOY_HOST, DEPLOY_SSH_KEY and DEPLOY_KNOWN_HOSTS (see README).
+on:
+  workflow_run:
+    workflows: [Test]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+# Never run two deploys at once; a newer one waits for the running one to finish
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    env:
+      # The exact commit that passed the tests, not whatever main points to by now
+      SHA: ${{ github.event.workflow_run.head_sha }}
+      URL: https://todo.cloudandbear.com
+
+    steps:
+      - name: Configure SSH
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Deploy
+        env:
+          HOST: ${{ secrets.DEPLOY_HOST }}
+        run: |
+          [[ "$SHA" =~ ^[0-9a-f]{40}$ ]]
+          ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes "deploy@$HOST" \
+            "cd ~/ToDoList && git fetch --quiet origin && git reset --hard $SHA && docker compose -f docker-compose.prod.yml up -d --build --remove-orphans && docker image prune -f"
+
+      - name: Smoke test
+        run: |
+          for attempt in $(seq 1 20); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$URL/health" || true)
+            if [ "$code" = "200" ]; then
+              echo "Healthy after $attempt attempt(s)"
+              exit 0
+            fi
+            echo "Attempt $attempt: HTTP $code"
+            sleep 6
+          done
+          echo "The site did not become healthy in time"
+          exit 1
