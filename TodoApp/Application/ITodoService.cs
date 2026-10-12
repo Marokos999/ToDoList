@@ -34,4 +34,8 @@ public interface ITodoService
     Task DeleteUserDataAsync(string userId);
 
     Task<ShareResult> ShareListAsync(Guid listId, string ownerUserId, string targetEmail);
+    Task<List<TodoItem>> SearchItemsAsync(string query, string userId);
+    Task<DashboardData> GetDashboardAsync(string userId);
+    Task<List<MemberDto>> GetMembersAsync(Guid listId, string ownerUserId);
+    Task<bool> RevokeShareAsync(Guid listId, string ownerUserId, string targetUserId);
 }

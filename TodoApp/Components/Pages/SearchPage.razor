@@ -1,0 +1,94 @@
+@page "/search"
+@attribute [Authorize]
+@rendermode InteractiveServer
+@inject ITodoService TodoService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Nav
+@inject IStringLocalizer<SharedResource> L
+
+<PageTitle>@L["Search"]</PageTitle>
+
+<div class="container mt-4">
+    <h3>@L["Search"]</h3>
+
+    <div class="d-flex gap-2 mb-3">
+        <RadzenTextBox @bind-Value="query"
+                       Placeholder="@L["SearchPlaceholder"]"
+                       Style="width:300px"
+                       @onkeyup="OnKeyUp" />
+        <RadzenButton Text="@L["SearchButton"]" Icon="search" Click="Search" />
+    </div>
+
+    @if (isSearching)
+    {
+        <p>@L["Loading"]</p>
+    }
+    else if (results is not null)
+    {
+        @if (!results.Any())
+        {
+            <p class="text-muted">@L["NoSearchResults"]</p>
+        }
+        else
+        {
+            <p class="text-muted">@L["SearchResultCount", results.Count]</p>
+            @foreach (var item in results)
+            {
+                <div class="card mb-2 shadow-sm @(item.IsCompleted ? "opacity-50" : "")"
+                     style="cursor:pointer"
+                     @onclick='() => Nav.NavigateTo($"/list/{item.ListId}")'>
+                    <div class="card-body py-2 d-flex align-items-center gap-3">
+                        <RadzenIcon Icon="@(item.IsCompleted ? "check_circle" : "radio_button_unchecked")"
+                                    Style="@(item.IsCompleted ? "color:var(--rz-success)" : "color:var(--rz-text-disabled-color)")" />
+                        <span class="flex-grow-1 @(item.IsCompleted ? "text-decoration-line-through" : "")">
+                            @item.Title
+                        </span>
+                        <small class="text-muted">@item.List?.Name</small>
+                        <RadzenBadge Text="@GetPriorityName(item.Priority)"
+                                     BadgeStyle="@GetBadgeStyle(item.Priority)" />
+                    </div>
+                </div>
+            }
+        }
+    }
+</div>
+
+@code {
+    private string query = string.Empty;
+    private List<TodoItem>? results;
+    private bool isSearching;
+    private string userId = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var auth = await AuthStateProvider.GetAuthenticationStateAsync();
+        userId = auth.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+    }
+
+    private async Task OnKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") await Search();
+    }
+
+    private async Task Search()
+    {
+        if (string.IsNullOrWhiteSpace(query)) return;
+        isSearching = true;
+        results = await TodoService.SearchItemsAsync(query, userId);
+        isSearching = false;
+    }
+
+    private BadgeStyle GetBadgeStyle(Priority p) => p switch
+    {
+        Priority.High => BadgeStyle.Danger,
+        Priority.Medium => BadgeStyle.Warning,
+        _ => BadgeStyle.Light
+    };
+
+    private string GetPriorityName(Priority p) => p switch
+    {
+        Priority.High => L["PriorityHigh"],
+        Priority.Medium => L["PriorityMedium"],
+        _ => L["PriorityLow"]
+    };
+}

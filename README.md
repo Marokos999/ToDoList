@@ -13,8 +13,12 @@ Real-time shared to-do lists built with **Blazor Server** on **.NET 10**. Create
 - Multiple lists per user, renamed and deleted from the list header
 - Tasks with priority, due date and description; everything is editable inline, and deleting asks for confirmation
 - Sharing a list with another registered user by email (owner only, with a clear message for every failure case)
-- Real-time updates: a change made by anyone on a shared list appears immediately for everyone viewing it
+- Members panel per list — owner sees all shared-with users and can revoke access individually
+- Real-time updates: a change made by anyone on a shared list appears immediately for everyone viewing it; a toast notification tells you who made the change (but only for other users' edits, not your own)
 - Access checks in the service layer, so only the owner and users the list is shared with can read or change it
+- Task sorting by completion status, then priority (High → Medium → Low), then due date
+- Dashboard at `/dashboard` — overdue tasks, due today, due this week, and total active count
+- Search at `/search` — full-text search across all accessible tasks by title and description
 - Serbian and English UI with a language dropdown in the top bar; Serbian is the default, and dates and the calendar follow the selected language
 
 ## Tech stack
@@ -31,13 +35,14 @@ Real-time shared to-do lists built with **Blazor Server** on **.NET 10**. Create
 
 ```text
 TodoListPage (Blazor component, runs on the server)
-   │  add / toggle / edit / delete
+   │  add / toggle / edit / delete / revoke member
    ▼
 TodoService ──── IDbContextFactory ────► PostgreSQL
-   │  after every change
+   │  after every change: Notify(listId, changedByUserId)
    ▼
-TodoNotifier (singleton) ── ListChanged(listId) ──► every open page of that list
+TodoNotifier (singleton) ── ListChanged(listId, changedByUserId) ──► every open page of that list
                                                         │  reloads its data
+                                                        │  shows toast only if changedByUserId ≠ current user
                                                         ▼
                                   Blazor sends the UI update over the page's circuit
 ```
@@ -50,10 +55,10 @@ TodoNotifier (singleton) ── ListChanged(listId) ──► every open page of
 
 ```text
 TodoApp/
-├── Application/   TodoService, ITodoService, TodoNotifier, ListSummary, ShareResult
+├── Application/   TodoService, ITodoService, TodoNotifier, MemberDto, DashboardData, ListSummary, ShareResult
 ├── Domain/        TodoList, TodoItem, TodoListShare, Priority
 ├── Data/          ApplicationDbContext, ApplicationUser
-├── Components/    Pages (Home, TodoListPage), Account (Identity UI, SMTP sender), Layout
+├── Components/    Pages (Home, TodoListPage, DashboardPage, SearchPage), Account (Identity UI, SMTP sender), Layout
 └── Migrations/    EF Core migrations, applied automatically on startup
 TodoApp.Tests/     xUnit tests for TodoService against a real PostgreSQL (Testcontainers)
 ```
@@ -159,3 +164,15 @@ Dumps go to `backups/`, which is git-ignored because it contains user data and p
 ### Custom domain
 
 Add the domain in Render → Settings → Custom Domains and create the DNS records Render shows; HTTPS is issued automatically. Then set `App__PublicUrl` to the new address, send email from an address on that domain, and add SPF/DKIM records with your email provider.
+
+### Self-hosting on a VPS
+
+[`docker-compose.prod.yml`](docker-compose.prod.yml) is meant for a server where a reverse proxy already handles HTTPS for several apps. The app joins an external Docker network called `edge` as `todo-app:8080`, no host ports are published, and PostgreSQL is only reachable inside the compose network. The proxy needs a site pointing at `todo-app:8080` and must pass WebSockets through (the Blazor circuit); behind it the app trusts the `X-Forwarded-*` headers.
+
+```bash
+docker network create edge 2>/dev/null   # once per server, skip if the proxy already created it
+cp .env.example .env                     # set POSTGRES_PASSWORD, SMTP_*, APP_PUBLIC_URL and LEGAL_*
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+Accounts can only be confirmed through the emailed link, so SMTP must be configured. To update: `git pull` and run the last command again.

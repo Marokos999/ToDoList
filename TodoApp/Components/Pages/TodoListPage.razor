@@ -7,6 +7,7 @@
 @inject NavigationManager Nav
 @inject TodoNotifier Notifier
 @inject DialogService DialogService
+@inject NotificationService NotificationService
 @inject IStringLocalizer<SharedResource> L
 
 <PageTitle>@(list?.Name ?? L["List"].Value)</PageTitle>
@@ -198,6 +199,25 @@
                 {
                     <small class="@(shareSucceeded ? "text-success" : "text-danger") mt-1 d-block">@shareMessage</small>
                 }
+
+                @if (members.Count > 0)
+                {
+                    <div class="mt-3">
+                        <h6 class="text-muted">@L["SharedWith"]</h6>
+                        @foreach (var m in members)
+                        {
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <RadzenIcon Icon="person" />
+                                <span>@(m.UserName ?? m.Email)</span>
+                                <small class="text-muted">@m.Email</small>
+                                <RadzenButton Icon="person_remove" ButtonStyle="ButtonStyle.Danger"
+                                              Size="ButtonSize.Small"
+                                              Click="@(() => RevokeShare(m.UserId))"
+                                              title="@L["RevokeAccess"]" />
+                            </div>
+                        }
+                    </div>
+                }
             </div>
         }
     }
@@ -220,6 +240,7 @@
     private string shareEmail = string.Empty;
     private string shareMessage = string.Empty;
     private bool shareSucceeded;
+    private List<MemberDto> members = [];
 
     private List<AttachmentInfo> attachments = [];
     private string importMessage = string.Empty;
@@ -253,11 +274,20 @@
             Notifier.ListChanged += OnListChanged;
     }
 
-    private Task OnListChanged(Guid listId) => listId != ListId
+    private Task OnListChanged(Guid listId, string changedByUserId) => listId != ListId
         ? Task.CompletedTask
         : InvokeAsync(async () =>
         {
             await LoadData();
+            if (changedByUserId != userId)
+            {
+                NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Info,
+                    Summary = L["CollabUpdated"],
+                    Duration = 3000
+                });
+            }
             StateHasChanged();
         });
 
@@ -265,6 +295,8 @@
     {
         list = await TodoService.GetListAsync(ListId, userId);
         await LoadItems();
+        if (list?.OwnerId == userId)
+            members = await TodoService.GetMembersAsync(ListId, userId);
     }
 
     private async Task LoadItems()
@@ -438,6 +470,12 @@
         Nav.NavigateTo("/");
     }
 
+    private async Task RevokeShare(string targetUserId)
+    {
+        await TodoService.RevokeShareAsync(ListId, userId, targetUserId);
+        members = await TodoService.GetMembersAsync(ListId, userId);
+    }
+
     private async Task ShareList()
     {
         if (string.IsNullOrWhiteSpace(shareEmail))
@@ -457,7 +495,11 @@
             ShareResult.SelfShare => L["ShareSelf"],
             _ => L["ShareNotOwner"]
         };
-        if (shareSucceeded) shareEmail = string.Empty;
+        if (shareSucceeded)
+        {
+            shareEmail = string.Empty;
+            members = await TodoService.GetMembersAsync(ListId, userId);
+        }
     }
 
     private BadgeStyle GetBadgeStyle(Priority p) => p switch
@@ -484,7 +526,9 @@
             ItemFilter.Completed => i.IsCompleted,
             _ => true
         })
-        .OrderBy(i => i.IsCompleted);
+        .OrderBy(i => i.IsCompleted)
+        .ThenByDescending(i => i.IsCompleted ? -1 : (int)i.Priority)
+        .ThenBy(i => i.DueDate ?? DateTime.MaxValue);
 
     private static bool IsOverdue(TodoItem item) =>
         !item.IsCompleted && item.DueDate is { } due && due.Date < DateTime.Today;

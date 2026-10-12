@@ -26,7 +26,7 @@ public class TodoService(IDbContextFactory<ApplicationDbContext> dbFactory, Todo
 
     db.TodoItems.Add(item);
     await db.SaveChangesAsync();
-    notifier.Notify(listId);
+    notifier.Notify(listId, userId);
     return item;
   }
 
@@ -53,7 +53,7 @@ public class TodoService(IDbContextFactory<ApplicationDbContext> dbFactory, Todo
     var listId = item.ListId;
     db.TodoItems.Remove(item);
     await db.SaveChangesAsync();
-    notifier.Notify(listId);
+    notifier.Notify(listId, userId);
   }
 
   public async Task DeleteListAsync(Guid listId, string userId)
@@ -63,7 +63,7 @@ public class TodoService(IDbContextFactory<ApplicationDbContext> dbFactory, Todo
     if(list is null) return;
     list.IsDeleted = true;
     await db.SaveChangesAsync();
-    notifier.Notify(listId);
+    notifier.Notify(listId, userId);
   }
 
   public async Task<List<TodoItem>> GetItemsAsync(Guid listId, string userId)
@@ -102,7 +102,7 @@ public class TodoService(IDbContextFactory<ApplicationDbContext> dbFactory, Todo
 
     list.Name = name.Trim();
     await db.SaveChangesAsync();
-    notifier.Notify(listId);
+    notifier.Notify(listId, userId);
   }
 
   public async Task MoveItemAsync(Guid itemId, Guid targetItemId, string userId)
@@ -274,7 +274,7 @@ public class TodoService(IDbContextFactory<ApplicationDbContext> dbFactory, Todo
     item.IsCompleted = !item.IsCompleted;
     item.CompletedAt =  item.IsCompleted ? DateTime.UtcNow : null;
     await db.SaveChangesAsync();
-    notifier.Notify(item.ListId);
+    notifier.Notify(item.ListId, userId);
   }
 
   public async Task UpdateItemAsync(Guid itemId, string title, Priority priority, DateTime? dueDate, string? description, string userId)
@@ -288,7 +288,76 @@ public class TodoService(IDbContextFactory<ApplicationDbContext> dbFactory, Todo
     item.DueDate = dueDate;
     item.Description = string.IsNullOrWhiteSpace(description) ? null : description.Trim();
     await db.SaveChangesAsync();
-    notifier.Notify(item.ListId);
+    notifier.Notify(item.ListId, userId);
+  }
+
+  public async Task<DashboardData> GetDashboardAsync(string userId)
+  {
+    await using var db = await dbFactory.CreateDbContextAsync();
+    var today = DateTime.UtcNow.Date;
+    var endOfWeek = today.AddDays(7);
+
+    var all = await AccessibleItems(db, userId)
+        .Include(i => i.List)
+        .Where(i => !i.IsCompleted)
+        .ToListAsync();
+
+    var dueToday = all.Where(i => i.DueDate.HasValue && i.DueDate.Value.Date == today).ToList();
+    var dueThisWeek = all
+        .Where(i => i.DueDate.HasValue && i.DueDate.Value.Date > today && i.DueDate.Value.Date <= endOfWeek)
+        .ToList();
+    var overdue = all.Where(i => i.DueDate.HasValue && i.DueDate.Value.Date < today).ToList();
+
+    return new DashboardData(dueToday, dueThisWeek, overdue, all.Count);
+  }
+
+  public async Task<List<TodoItem>> SearchItemsAsync(string query, string userId)
+  {
+    if (string.IsNullOrWhiteSpace(query)) return [];
+    await using var db = await dbFactory.CreateDbContextAsync();
+    var q = query.Trim();
+    return await AccessibleItems(db, userId)
+        .Include(i => i.List)
+        .Where(i => i.Title.Contains(q) || (i.Description != null && i.Description.Contains(q)))
+        .OrderBy(i => i.IsCompleted)
+        .ThenBy(i => i.List.Name)
+        .ToListAsync();
+  }
+
+  public async Task<List<MemberDto>> GetMembersAsync(Guid listId, string ownerUserId)
+  {
+    await using var db = await dbFactory.CreateDbContextAsync();
+    var isOwner = await db.TodoLists.AnyAsync(l => l.Id == listId && l.OwnerId == ownerUserId);
+    if (!isOwner) return [];
+
+    var shares = await db.TodoListShares
+        .Where(s => s.ListId == listId)
+        .ToListAsync();
+
+    var result = new List<MemberDto>();
+    foreach (var share in shares)
+    {
+        var user = await userManager.FindByIdAsync(share.UserId);
+        if (user is not null)
+            result.Add(new MemberDto(user.Id, user.Email ?? "", user.UserName));
+    }
+    return result;
+  }
+
+  public async Task<bool> RevokeShareAsync(Guid listId, string ownerUserId, string targetUserId)
+  {
+    await using var db = await dbFactory.CreateDbContextAsync();
+    var isOwner = await db.TodoLists.AnyAsync(l => l.Id == listId && l.OwnerId == ownerUserId);
+    if (!isOwner) return false;
+
+    var share = await db.TodoListShares
+        .FirstOrDefaultAsync(s => s.ListId == listId && s.UserId == targetUserId);
+    if (share is null) return false;
+
+    db.TodoListShares.Remove(share);
+    await db.SaveChangesAsync();
+    notifier.Notify(listId, ownerUserId);
+    return true;
   }
 
   private static IQueryable<TodoList> AccessibleLists(ApplicationDbContext db, string userId) =>

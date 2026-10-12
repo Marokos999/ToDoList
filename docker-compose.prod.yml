@@ -1,0 +1,52 @@
+# Production stack for a server where a shared reverse proxy already handles HTTPS (see DevOps/hetzner-edge).
+# The app joins the external `edge` network as todo-app:8080; the database is reachable inside this stack only.
+#   docker compose -f docker-compose.prod.yml up -d --build
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-todoapp}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      # Npgsql tries GSS encryption by default and the runtime image has no libgssapi, which logs an error on every start
+      ConnectionStrings__DefaultConnection: Host=db;Port=5432;Database=${POSTGRES_DB:-todoapp};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD};GSS Encryption Mode=Disable
+      # Without SMTP nobody can confirm an account (the confirmation link is only shown when Account__ShowConfirmationLink is on, never do that here)
+      Smtp__Host: ${SMTP_HOST:-smtp.gmail.com}
+      Smtp__Port: ${SMTP_PORT:-587}
+      Smtp__FromAddress: ${SMTP_FROM_ADDRESS:-}
+      Smtp__UserName: ${SMTP_USERNAME:-}
+      Smtp__Password: ${SMTP_PASSWORD:-}
+      # Public address (robots.txt, sitemap) and the operator details shown on the privacy and terms pages
+      App__PublicUrl: ${APP_PUBLIC_URL:-}
+      Legal__OperatorName: ${LEGAL_OPERATOR_NAME:-}
+      Legal__ContactEmail: ${LEGAL_CONTACT_EMAIL:-}
+    networks:
+      default:
+      edge:
+        aliases: [todo-app]
+
+networks:
+  edge:
+    external: true
+
+volumes:
+  pgdata:

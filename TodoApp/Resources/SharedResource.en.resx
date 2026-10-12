@@ -55,6 +55,21 @@
   <data name="ShareAlreadyShared" xml:space="preserve"><value>The list is already shared with that user.</value></data>
   <data name="ShareSelf" xml:space="preserve"><value>You can't share a list with yourself.</value></data>
   <data name="ShareNotOwner" xml:space="preserve"><value>Only the owner can share the list.</value></data>
+  <data name="SharedWith" xml:space="preserve"><value>Shared with:</value></data>
+  <data name="RevokeAccess" xml:space="preserve"><value>Revoke access</value></data>
+  <data name="CollabUpdated" xml:space="preserve"><value>List was updated by another user.</value></data>
+  <data name="NoListsHint" xml:space="preserve"><value>Click the button below to create your first todo list.</value></data>
+  <data name="Dashboard" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="DashOverdue" xml:space="preserve"><value>Overdue</value></data>
+  <data name="DashDueToday" xml:space="preserve"><value>Due Today</value></data>
+  <data name="DashThisWeek" xml:space="preserve"><value>This Week</value></data>
+  <data name="DashTotalActive" xml:space="preserve"><value>Total Active</value></data>
+  <data name="DashAllClear" xml:space="preserve"><value>All clear! No upcoming tasks.</value></data>
+  <data name="Search" xml:space="preserve"><value>Search</value></data>
+  <data name="SearchPlaceholder" xml:space="preserve"><value>Search tasks...</value></data>
+  <data name="SearchButton" xml:space="preserve"><value>Search</value></data>
+  <data name="NoSearchResults" xml:space="preserve"><value>No results found.</value></data>
+  <data name="SearchResultCount" xml:space="preserve"><value>{0} results</value></data>
   <data name="DeleteTaskTitle" xml:space="preserve"><value>Delete task</value></data>
   <data name="DeleteTaskConfirm" xml:space="preserve"><value>Are you sure you want to delete the task “{0}”?</value></data>
   <data name="DeleteListTitle" xml:space="preserve"><value>Delete list</value></data>

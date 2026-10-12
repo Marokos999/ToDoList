@@ -55,6 +55,21 @@
   <data name="ShareAlreadyShared" xml:space="preserve"><value>Lista je već podeljena sa tim korisnikom.</value></data>
   <data name="ShareSelf" xml:space="preserve"><value>Ne možeš da podeliš listu sa sobom.</value></data>
   <data name="ShareNotOwner" xml:space="preserve"><value>Samo vlasnik može da deli listu.</value></data>
+  <data name="SharedWith" xml:space="preserve"><value>Podeljeno sa:</value></data>
+  <data name="RevokeAccess" xml:space="preserve"><value>Povuci pristup</value></data>
+  <data name="CollabUpdated" xml:space="preserve"><value>Lista je ažurirana od strane drugog korisnika.</value></data>
+  <data name="NoListsHint" xml:space="preserve"><value>Klikni dugme da kreiraš svoju prvu listu zadataka.</value></data>
+  <data name="Dashboard" xml:space="preserve"><value>Pregled</value></data>
+  <data name="DashOverdue" xml:space="preserve"><value>Zakašnjeli</value></data>
+  <data name="DashDueToday" xml:space="preserve"><value>Danas</value></data>
+  <data name="DashThisWeek" xml:space="preserve"><value>Ova sedmica</value></data>
+  <data name="DashTotalActive" xml:space="preserve"><value>Ukupno aktivnih</value></data>
+  <data name="DashAllClear" xml:space="preserve"><value>Sve je završeno! Nema zaostalih zadataka.</value></data>
+  <data name="Search" xml:space="preserve"><value>Pretraga</value></data>
+  <data name="SearchPlaceholder" xml:space="preserve"><value>Pretraži zadatke...</value></data>
+  <data name="SearchButton" xml:space="preserve"><value>Traži</value></data>
+  <data name="NoSearchResults" xml:space="preserve"><value>Nema rezultata.</value></data>
+  <data name="SearchResultCount" xml:space="preserve"><value>{0} rezultata</value></data>
   <data name="DeleteTaskTitle" xml:space="preserve"><value>Brisanje zadatka</value></data>
   <data name="DeleteTaskConfirm" xml:space="preserve"><value>Da li sigurno želiš da obrišeš zadatak „{0}“?</value></data>
   <data name="DeleteListTitle" xml:space="preserve"><value>Brisanje liste</value></data>

@@ -243,9 +243,9 @@ public sealed class TodoServiceTests(PostgresFixture fixture) : IClassFixture<Po
         var owner = await CreateUserAsync();
         var list = await service.CreateListAsync("List", owner.Id);
         var notifications = 0;
-        Task OnChanged(Guid listId)
+        Task OnChanged(Guid listId, string changedByUserId)
         {
-            if (listId == list.Id) notifications++;
+            if (listId == list.Id && changedByUserId == owner.Id) notifications++;
             return Task.CompletedTask;
         }
 
